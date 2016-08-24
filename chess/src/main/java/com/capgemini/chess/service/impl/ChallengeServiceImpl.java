@@ -17,7 +17,6 @@ import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
 import com.capgemini.chess.service.GameService;
-import com.capgemini.chess.service.to.ChallengeTO;
 import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 @Service
@@ -46,21 +45,20 @@ public class ChallengeServiceImpl implements ChallengeService {
 			throws ChallengeDataIntegrityViolationException {
 		List<PlayerStatisticsEntity> playersStatistics = challengeDao
 				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged); 
-		if (playersStatistics.get(0) == null || playersStatistics.get(1) == null) {
-			throw new ChallengeDataIntegrityViolationException("Cannot create challenge, "
-					+ "because some Player requested in this challenge does not exist anymore!");
-		}
+
 		int playerChallengingIndexInList = setPlayerChallengingIndexInList(playersStatistics.get(0), idPlayerChallenging);
 		int playerChallengedIndexInList = setPlayerChallengedIndexInList(playerChallengingIndexInList);
-		
+		if (playersStatistics.get(playerChallengingIndexInList).getChallengesSent().isEmpty() == false 
+				&& playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0) != null) {
+			// Version has to be changed, otherwise Listeners won't be fired up and no changes will be made.
+//			playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).setVersion(
+//					playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).getVersion() + 1); 
+			playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).setDateCreated(null);
+			return challengeDao.update(playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0));
+		}
 		ChallengeEntity challenge = new ChallengeEntity();
 		setChallengeEntityForChallengeCreation(challenge, 
 				playersStatistics.get(playerChallengingIndexInList), playersStatistics.get(playerChallengedIndexInList));
-		
-		if (playersStatistics.get(playerChallengingIndexInList).getChallengesSent().isEmpty() == false 
-				&& playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0) != null) {
-			return challengeDao.update(challenge);
-		}
 		return challengeDao.save(challenge);
 	}
 
@@ -68,19 +66,15 @@ public class ChallengeServiceImpl implements ChallengeService {
 			PlayerStatisticsEntity playerChallenging, PlayerStatisticsEntity playerChallenged) {
 		challenge.setPlayerChallenging(playerChallenging);
 		challenge.setPlayerChallenged(playerChallenged);
-		challenge.setLevelOfChallengingPlayer(playerChallenging.getLevel());
-		challenge.setLevelOfChallengedPlayer(playerChallenged.getLevel());
+		challenge.setLevelPlayerChallenging(playerChallenging.getLevel());
+		challenge.setLevelPlayerChallenged(playerChallenged.getLevel());
 	}
 
 	private int setPlayerChallengingIndexInList(PlayerStatisticsEntity playerStatistics,
 			long idPlayerChallenging) {
 		if (playerStatistics.getId() == idPlayerChallenging) {
-//			playerChallengingIndexInList = new Integer(0);
-//			playerChallengedIndexInList = new Integer(1);
 			return 0;
 		}
-//		playerChallengingIndexInList = 1;
-//		playerChallengedIndexInList = 0;
 		return 1;
 	}
 	
@@ -96,7 +90,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * @return list with at most 5 potential matching players
 	 */
 	@Override
-	public List<PlayerStatisticsTO> getMatchingPlayers(long idOfChallengingPlayer) {
+	public List<PlayerStatisticsEntity> getMatchingPlayers(long idOfChallengingPlayer) {
 //		List<PlayerStatisticsTO> potentialRivalPlayers = 
 //				playerStatisticsDao.getMatchingPlayersList(idOfChallengingPlayer);
 //		PlayerStatisticsTO challengingPlayer = potentialRivalPlayers.get(potentialRivalPlayers.size()-1);
@@ -142,38 +136,27 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * @throws PlayerNotExistException - if any of the players does not exist in DB anymore
 	 */
 	@Override
-	public void acceptChallenge(long idChallenge) throws ChallengeNotExistException, 
-	ChallengeIsNoLongerValidException, PlayerNotExistException {
-//		ChallengeTO challengeToAccept = challengeDao.getChallengeStatistics(idChallenge);
-//		isChallengedReturned(idChallenge, challengeToAccept);
-//		isPlayersExistInChallenge(challengeToAccept);
-//		isPlayersLevelsChanged(idChallenge, challengeToAccept);
-//		gameService.startMatch(challengeToAccept);
+	public void acceptChallenge(long idChallenge) throws ChallengeDataIntegrityViolationException {
+		ChallengeEntity challengeToAccept = challengeDao.findOne(idChallenge);
+		isChallengedReturned(idChallenge, challengeToAccept);
+		isPlayersLevelsChanged(challengeToAccept);
+		gameService.startMatch(challengeToAccept);
 	}
 
-	private void isPlayersLevelsChanged(long idChallenge, ChallengeTO challengeToAccept)
-			throws ChallengeIsNoLongerValidException {
-		if (challengeToAccept.getChallengedPlayer().getLevel() != challengeToAccept.getLevelOfChallengedPlayer()
-				|| challengeToAccept.getChallengingPlayer().getLevel() != challengeToAccept.getLevelOfChallengingPlayer()) {
-			throw new ChallengeIsNoLongerValidException(idChallenge);
+	private void isPlayersLevelsChanged(ChallengeEntity challengeToAccept)
+			throws ChallengeDataIntegrityViolationException {
+		if (challengeToAccept.getPlayerChallenging().getLevel() != challengeToAccept.getLevelPlayerChallenging()
+				|| challengeToAccept.getPlayerChallenged().getLevel() != challengeToAccept.getLevelPlayerChallenged()) {
+			throw new ChallengeDataIntegrityViolationException("Challenge with id: " + challengeToAccept.getId() + 
+					" is no longer valid, because players' level changed.");
 		}
 	}
 
-	private void isChallengedReturned(long idChallenge, ChallengeTO challengeToAccept)
-			throws ChallengeNotExistException {
+	private void isChallengedReturned(long idChallenge, ChallengeEntity challengeToAccept)
+			throws ChallengeDataIntegrityViolationException {
 		if (challengeToAccept == null) {
-			throw new ChallengeNotExistException(idChallenge);
-		}
-	}
-
-	private void isPlayersExistInChallenge(ChallengeTO challengeToAccept) {
-		if (challengeToAccept.getChallengingPlayer() == null 
-				|| challengeToAccept.getChallengedPlayer() == null) {
-			throw new PlayerNotExistException();
-		}
-		if (challengeToAccept.getChallengingPlayer().getId() == 0 
-				|| challengeToAccept.getChallengedPlayer().getId() == 0) {
-			throw new PlayerNotExistException();
+			throw new ChallengeDataIntegrityViolationException("Specified challenge with id = " + idChallenge
+					+ " does not exist anymore!");
 		}
 	}
 
@@ -183,10 +166,9 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * If there are no such challenges, returns empty list.
 	 */
 	@Override
-	public List<ChallengeTO> getSentChallenges(long idPlayer) {
-//		List<ChallengeTO> sentChallenges = challengeDao.getPlayersSentChallenges(idPlayer);
-//		return sentChallenges;
-		return null;
+	public List<ChallengeEntity> getSentChallenges(long idPlayer) {
+		List<ChallengeEntity> sentChallenges = challengeDao.getPlayersSentChallenges(idPlayer);
+		return sentChallenges;
 	}
 
 	/**Retrieves from DB (through ChallengesDAO) all challenges, which were received by specific player.
@@ -195,19 +177,10 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * If there are no such challenges, returns empty list.
 	 */
 	@Override
-	public List<ChallengeTO> getReceivedChallenges(long idPlayer) {
-//		List<ChallengeTO> receivedChallenges = challengeDao.getPlayersReceivedChallenges(idPlayer);
-//		return receivedChallenges;
-		return null;
+	public List<ChallengeEntity> getReceivedChallenges(long idPlayer) {
+		List<ChallengeEntity> receivedChallenges = challengeDao.getPlayersReceivedChallenges(idPlayer);
+		return receivedChallenges;
 	}
-	
-//	private long generateChallengeId(long idOfChallengingPlayer, long idOfChallengedPlayer) {
-//		final long prime = 2;
-//		long result = 1;
-//		result = prime * result + idOfChallengingPlayer;
-//		result = prime * result + idOfChallengedPlayer;
-//		return result;
-//	}
 	
 	/**Removes from DB all challenges, which are older than 7 seven days.
 	 */

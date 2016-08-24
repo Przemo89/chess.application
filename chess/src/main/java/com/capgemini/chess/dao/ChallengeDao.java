@@ -35,4 +35,6 @@ public interface ChallengeDao extends Dao<ChallengeEntity, Long> {
 	/**Removes from DB all challenges, which are older than 7 seven days.
 	 */
 	void removeOutdatedChallenges();
+	
+//	int updateChallengeDatesCreationAndLastModification(long idChallenge);
 }

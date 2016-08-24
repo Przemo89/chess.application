@@ -33,20 +33,25 @@ public class ChallengeDaoImpl extends AbstractDao<ChallengeEntity, Long> impleme
 				+ "and id_player_challenged = :id_player_challenged)", PlayerStatisticsEntity.class);
 		query.setParameter("id_player_challenging", idPlayerChallenging);
 		query.setParameter("id_player_challenged", idPlayerChallenged);
-		// TODO Auto-generated method stub
 		return query.getResultList();
 	}
 
 	@Override
 	public List<ChallengeEntity> getPlayersSentChallenges(long idPlayer) {
-		// TODO Auto-generated method stub
-		return null;
+		TypedQuery<ChallengeEntity> query = entityManager.createQuery(
+				"select c from ChallengeEntity c "
+				+ "where id_player_challenging = :id_player_challenging", ChallengeEntity.class);
+		query.setParameter("id_player_challenging", idPlayer);
+		return query.getResultList();
 	}
 
 	@Override
 	public List<ChallengeEntity> getPlayersReceivedChallenges(long idPlayer) {
-		// TODO Auto-generated method stub
-		return null;
+		TypedQuery<ChallengeEntity> query = entityManager.createQuery(
+				"select c from ChallengeEntity c "
+				+ "where id_player_challenged = :id_player_challenged", ChallengeEntity.class);
+		query.setParameter("id_player_challenged", idPlayer);
+		return query.getResultList();
 	}
 
 	@Override
@@ -67,5 +72,15 @@ public class ChallengeDaoImpl extends AbstractDao<ChallengeEntity, Long> impleme
 		// TODO Auto-generated method stub
 		
 	}
+
+//	@Override
+//	public int updateChallengeDatesCreationAndLastModification(long idChallenge) {
+//		// TODO Auto-generated method stub
+//		Query query = entityManager.createQuery("update ChallengeEntity c set date_creation = current_timestamp() "
+//				+ "where id = :id");
+//		query.setParameter("id", idChallenge);
+//		query.executeUpdate();
+//		return 0;
+//	}
 
 }

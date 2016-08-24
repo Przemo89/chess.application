@@ -3,7 +3,6 @@ package com.capgemini.chess.dataaccess.entities;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -33,21 +32,21 @@ public class ChallengeEntity extends VersionControl implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_player_challenging", nullable = false)
 	private PlayerStatisticsEntity playerChallenging;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "id_player_challenged", nullable = false)
 	private PlayerStatisticsEntity playerChallenged;
 	
 	@Column(name = "level_player_challenging", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private Level levelOfChallengingPlayer;
+	private Level levelPlayerChallenging;
 	
 	@Column(name = "level_player_challenged", nullable = false)
 	@Enumerated(EnumType.STRING)
-	private Level levelOfChallengedPlayer;
+	private Level levelPlayerChallenged;
 	
 	
 	public ChallengeEntity() {
@@ -87,19 +86,19 @@ public class ChallengeEntity extends VersionControl implements Serializable {
 		this.playerChallenged = playerChallenged;
 	}
 
-	public Level getLevelOfChallengingPlayer() {
-		return levelOfChallengingPlayer;
+	public Level getLevelPlayerChallenging() {
+		return levelPlayerChallenging;
 	}
 
-	public void setLevelOfChallengingPlayer(Level levelOfChallengingPlayer) {
-		this.levelOfChallengingPlayer = levelOfChallengingPlayer;
+	public void setLevelPlayerChallenging(Level levelOfChallengingPlayer) {
+		this.levelPlayerChallenging = levelOfChallengingPlayer;
 	}
 
-	public Level getLevelOfChallengedPlayer() {
-		return levelOfChallengedPlayer;
+	public Level getLevelPlayerChallenged() {
+		return levelPlayerChallenged;
 	}
 
-	public void setLevelOfChallengedPlayer(Level levelOfChallengedPlayer) {
-		this.levelOfChallengedPlayer = levelOfChallengedPlayer;
+	public void setLevelPlayerChallenged(Level levelOfChallengedPlayer) {
+		this.levelPlayerChallenged = levelOfChallengedPlayer;
 	}
 }

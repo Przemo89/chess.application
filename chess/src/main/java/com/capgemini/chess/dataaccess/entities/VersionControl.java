@@ -17,11 +17,11 @@ public abstract class VersionControl {
 	@Column(name = "version", columnDefinition = "INTEGER DEFAULT 1", nullable = false)
 	private Integer version = 1;
 	
-	@Column(name = "date_creation", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",nullable = false, unique = false)
+	@Column(name = "date_creation", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false, unique = false, updatable = true)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateCreated;
 	
-	@Column(name = "date_last_modification", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false, unique = false)
+	@Column(name = "date_last_modification", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP", nullable = false, unique = false, updatable = true)
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date dateLastModified;
 	
