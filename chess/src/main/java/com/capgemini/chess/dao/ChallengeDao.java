@@ -2,33 +2,35 @@ package com.capgemini.chess.dao;
 
 import java.util.List;
 
-import com.capgemini.chess.exception.PlayerNotExistException;
-import com.capgemini.chess.service.to.ChallengeTO;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
+import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
+import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 
-public interface ChallengeDao {
+public interface ChallengeDao extends Dao<ChallengeEntity, Long> {
 
-	List<ChallengeTO> getPlayersSentChallenges(long idPlayer);
-	List<ChallengeTO> getPlayersReceivedChallenges(long idPlayer);
-	
-	/**Retrieves from DB full statistics of specific challenge, including 
-	 * players' levels during creation of the challenge and 
-	 * current participant players' levels (to compare by ChallengeService).
-	 * @param idChallenge - identifies challenge.
-	 * @return full challenge statistics.
+	/**Retrieves from DB players statistics entities of both challenging and challenged players.
+	 * Also - if such challenge entity exists - retrieves challenge entity from DB, which already 
+	 * exists for both players. If challenge exists, it will be only updated, if not - new one 
+	 * will be created.
+	 * @param idPlayerChallenging
+	 * @param idPlayerChallenged
+	 * @return list which should contain two filled entities. Service will verify it and in case when 
+	 * some of the returned entities would turn out to be null, proper Exception will be thrown.
 	 */
-	ChallengeTO getChallengeStatistics(long idChallenge);
+	List<PlayerStatisticsEntity> findBothPlayerStatisticsForChallengeCreation(long idPlayerChallenging, long idPlayerChallenged);
+	
+	List<ChallengeEntity> getPlayersSentChallenges(long idPlayer);
+	List<ChallengeEntity> getPlayersReceivedChallenges(long idPlayer);
 	
 	/**Removes provided challenge record from DB.
 	 * @param idChallenge
 	 */
-	void removeChallenge(long idChallenge);
+	void deleteChallenge(ChallengeEntity challenge);
 	
-	/**Puts new challenge record in DB.
-	 * @param manualChallengeToSet - challenge, which was validated first by service
-	 * @throws PlayerNotExistException - in case some of the player's id was not found is DB.
-	 */
-	void setChallenge(ChallengeTO manualChallengeToSet) throws PlayerNotExistException;
+//	/**Puts new challenge record in DB.
+//	 * @param manualChallengeToSet - challenge, which was validated first by service
+//	 * @throws PlayerNotExistException - in case some of the player's id was not found is DB.
+//	 */
+//	void setChallenge(ChallengeEntity manualChallengeToSet) throws PlayerNotExistException;
 	
 	/**Removes from DB all challenges, which are older than 7 seven days.
 	 */

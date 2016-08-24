@@ -6,9 +6,9 @@ import com.capgemini.chess.algorithms.data.enums.Level;
 
 public class ChallengeTO {
 
-	private long idChallenge = 0;
-	private long idOfChallengingPlayer = 0;
-	private long idOfChallengedPlayer = 0;
+	private long idChallenge;
+	private long idOfChallengingPlayer;
+	private long idOfChallengedPlayer;
 	private Level levelOfChallengingPlayer;
 	private Level levelOfChallengedPlayer;
 	private LocalDate dateOfChallengeCreation;

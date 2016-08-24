@@ -2,6 +2,8 @@ package com.capgemini.chess.service;
 
 import java.util.List;
 
+import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
+import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -15,8 +17,10 @@ public interface ChallengeService {
 	 * during accepting of challenge.
 	 * @param idOfChallengingPlayer
 	 * @param idOfChallengedPlayer
+	 * @return challenge entity which was saved or updated.
 	 */
-	void createManualChallenge(long idOfChallengingPlayer, long idOfChallengedPlayer) throws PlayerNotExistException;
+	ChallengeEntity createManualChallenge(long idChallengingPlayer, long idChallengedPlayer) 
+			throws ChallengeDataIntegrityViolationException;
 	
 	/**Finds matching players during creation of challenge list (automatic)
 	 * @param idOfChallengingPlayer

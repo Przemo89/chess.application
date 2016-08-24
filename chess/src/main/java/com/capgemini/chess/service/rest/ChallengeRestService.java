@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -30,7 +31,7 @@ public class ChallengeRestService {
 	@RequestMapping(value = "/manual/create/{idChallenger}/{idChallenged}", method = RequestMethod.POST)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void createManualChallenge(@PathVariable(value = "idChallenger") final long idOfChallengingPlayer, 
-			@PathVariable(value = "idChallenged") final long idOfChallengedPlayer) throws PlayerNotExistException {
+			@PathVariable(value = "idChallenged") final long idOfChallengedPlayer) throws ChallengeDataIntegrityViolationException {
 		challengeService.createManualChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
 	}
 	

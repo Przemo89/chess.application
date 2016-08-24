@@ -4,7 +4,7 @@ import com.capgemini.chess.algorithms.data.enums.Level;
 
 public class PlayerStatisticsTO {
 
-	private long id = 0L;
+	private long id;
 	private Level level;
 	private int points;
 	private int gamesPlayed;
