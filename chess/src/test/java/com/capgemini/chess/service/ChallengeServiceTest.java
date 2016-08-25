@@ -2,6 +2,9 @@ package com.capgemini.chess.service;
 
 import static org.junit.Assert.assertEquals;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -24,6 +27,8 @@ import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
+import com.capgemini.chess.exception.PlayerStatisticsDataIntegrityViolationException;
+import com.capgemini.chess.exception.PlayerNotExistException;
 
 
 /**TestCase 1. Creation of manual challenge - if challenge already exists in
@@ -67,7 +72,6 @@ import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
 
 @SpringApplicationConfiguration(ChessApplication.class)
 @RunWith(SpringJUnit4ClassRunner.class)
-//@ContextConfiguration
 public class ChallengeServiceTest {
 	
 	@Autowired
@@ -82,50 +86,9 @@ public class ChallengeServiceTest {
 	@Autowired
 	private EntityManager entityManager;
 	
-//	@Configuration
-//	static class ChallengeServiceTestConfiguration {
-//		@Bean
-//		public GameService gameService() {
-//			gameService = Mockito.mock(GameServiceImpl.class);
-//			return gameService;
-//		}
-//		
-//		@Bean
-//		public ChallengeDao challengesDao() {
-//			return new ChallengeDaoImpl();
-//		}
-//		
-//		@Bean
-//		public PlayerStatisticsDao playersStatisticsDao() {
-//			return new PlayerStatisticsDaoImpl();
-//		}
-//		
-//		@Bean
-//		public ChallengeService challengeService() {
-//			return new ChallengeServiceImpl();
-//		}
-//		
-////		@Bean
-////		public EntityManager entityManager() {
-////			return new EntityMana;
-////		}
-//	}
-	
-	
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
-	
-//	@Before
-//	public void instantiateTestListANew() {
-//		ChallengeTOTestList.setInitialValuesOfProperChallengesWithPlayerStatisticsToTestList();
-//		ChallengeTOTestList.setInitialValuesOfProperChallengesWithoutPlayerStatisticsToTestList();
-//		ChallengeTOTestList.setInitialValuesOfInproperChallengesToTestList();
-//		ChallengeTOTestList.setInitialValuesOfTestListForInsertionOnly();
-//		ChallengeTOTestList.setInitialValuesOfOutdatedChallengesToTestList();
-//		
-//		PlayerStatisticsTOTestList.setInitialValuesOfPlayerStatisticsToTestList();
-//	}
-//	
+		
 	/**TestCase 1. Creation of manual challenge - if challenge already exists in
 	 * @ChallengeTOTestList.PROPER_CHALLENGES_TO_TEST_LIST, then it should be only updated 
 	 * with players' current levels and date.
@@ -144,7 +107,7 @@ public class ChallengeServiceTest {
 		
 		//when
 		TimeUnit.SECONDS.sleep(2);
-		ChallengeEntity challengeAfterUpdate = challengeService.createManualChallenge(idChallengingPlayer, idChallengedPlayer);
+		ChallengeEntity challengeAfterUpdate = challengeService.createChallenge(idChallengingPlayer, idChallengedPlayer);
 		//then
 		List<ChallengeEntity> challengesListAfterChallengeUpdate = challengeRepository.findAll();
 
@@ -165,7 +128,7 @@ public class ChallengeServiceTest {
 		final int sizeBefore = challengesListBeforeChallengeCreation.size();
 		
 		//when
-		ChallengeEntity challengeSaved = challengeService.createManualChallenge(idChallengingPlayer, idChallengedPlayer);
+		ChallengeEntity challengeSaved = challengeService.createChallenge(idChallengingPlayer, idChallengedPlayer);
 		
 		//then
 		List<ChallengeEntity> challengesListAfterChallengeCreation = challengeRepository.findAll();
@@ -174,87 +137,104 @@ public class ChallengeServiceTest {
 		assertEquals(idChallengedPlayer, challengeSaved.getPlayerChallenged().getId());
 	}
 	
-//	
-//	/**TestCase 4. Finding matching players for automatic challenge for specific requesting 
-//	 * player should return list with maximum 5 entries, with players which have 
-//	 * +2/+1/+0/-1/-2 levels in regard to requesting player.
-//	 */
-//	@Test
-//	public void shouldReturnListOfMatchingPlayersWith5Entries() {
-//		//given
-//		PlayerStatisticsTO challengingPlayer = PlayerStatisticsTOTestList.PLAYER_STATISTICS_TO_TEST_LIST.get(4);
-//		
-//		//when
-//		List<PlayerStatisticsTO> resultList = challengeServiceTest.getMatchingPlayers(challengingPlayer.getId());
-//		int properSize = 5;
-//		boolean isPlayersWithOnlyProperLevels = true;
-//		for (PlayerStatisticsTO player : resultList) {
-//			if (Math.abs(player.getLevel().getValue() - challengingPlayer.getLevel().getValue()) > 2) {
-//				isPlayersWithOnlyProperLevels = false;
-//			}
-//		}
-//		//then
-//		Assert.assertEquals(properSize, resultList.size());
-//		Assert.assertTrue(isPlayersWithOnlyProperLevels);
-//	}
-//	
-//	/**TestCase 5. Finding matching players for automatic challenge for specific requesting 
-//	 * player should return list without challenging player.
-//	 */
-//	@Test
-//	public void shouldReturnListWithoutChallengingPlayer() {
-//		//given
-//		PlayerStatisticsTO challengingPlayer = PlayerStatisticsTOTestList.PLAYER_STATISTICS_TO_TEST_LIST.get(4);
-//		
-//		//when
-//		List<PlayerStatisticsTO> resultList = challengeServiceTest.getMatchingPlayers(challengingPlayer.getId());
-//		boolean isListContainingChallengingPlayer = false;
-//		for (PlayerStatisticsTO player : resultList) {
-//			if (player.getId() == challengingPlayer.getId()) {
-//				isListContainingChallengingPlayer = true;
-//			}
-//		}
-//		//then
-//		Assert.assertFalse(isListContainingChallengingPlayer);
-//	}
-//	
-//	/**TestCase 6. Found matching players for automatic challenge for specific requesting 
-//	 * player should have set up potential benefit/loss for challenging player.
-//	 * Tests of calculation of benefit/profit has been created in @PointsCalculatorTest.
-//	 */
-//	@Test
-//	public void shouldReturnListOfMatchingPlayersWithFilledBenefitLoss() {
-//		//given
-//		PlayerStatisticsTO challengingPlayer = PlayerStatisticsTOTestList.PLAYER_STATISTICS_TO_TEST_LIST.get(4);
-//		
-//		//when
-//		List<PlayerStatisticsTO> resultList = challengeServiceTest.getMatchingPlayers(challengingPlayer.getId());
-//		
-//		//then
-//		for (PlayerStatisticsTO player : resultList) {
-//			Assert.assertTrue(player.getPotentialBenefitForChallengingPlayer() > 0);
-//			Assert.assertTrue(player.getPotentialLossForChallengingPlayer() > 0);
-//		}
-//	}
-//	
-//	/**TestCase 7. If during finding matching players procedure challenging player won't be found
-//	 * in DB, @PlayerNotExistException should be thrown.
-//	 */
-//	@Test
-//	public void shouldThrowExceptionWhenGettingMatchingPlayers() {
-//		//given
-//		PlayerStatisticsTO challengingPlayer = new PlayerStatisticsTO();
-//		challengingPlayer.setId(36L);
-//		//then
-//		thrown.expect(PlayerNotExistException.class);
-//		thrown.expectMessage("Player does not exist anymore.");
-//		//when
-//		challengeServiceTest.getMatchingPlayers(challengingPlayer.getId());
-//	}
-//	
+	@Test
+	public void shouldReturnListWithPlayersProperLevelsWhenGettingMatchingPlayers() throws Exception {
+		//given
+		final long idPlayerChallengingExisting = 12L;
+		PlayerStatisticsEntity playerChallenging = playerStatisticsRepository.findOne(idPlayerChallengingExisting);
+		int levelValuePlayerChallenging = playerChallenging.getLevel().getValue();
+		
+		//when
+		List<PlayerStatisticsEntity> resultList = challengeService.getMatchingPlayers(idPlayerChallengingExisting);
+		final int properSize = 5;
+		boolean isPlayersWithOnlyProperLevels = true;
+		for (PlayerStatisticsEntity player : resultList) {
+			if (Math.abs(player.getLevel().getValue() - levelValuePlayerChallenging) > 2) {
+				isPlayersWithOnlyProperLevels = false;
+			}
+		}
+		
+		//then
+		Assert.assertEquals(properSize, resultList.size());
+		Assert.assertTrue(isPlayersWithOnlyProperLevels);
+	}
+	
+	@Test
+	public void shouldReturnListWithPlayersNullifiedPasswordsWhenGettingMatchingPlayers() throws Exception {
+		//given
+		final long idPlayerChallengingExisting = 12L;
+		final long rankingPositionChuckNorris = 1L;
+		final long rankingPositionMaster = 2L;
+		
+		//when
+		List<PlayerStatisticsEntity> resultList = challengeService.getMatchingPlayers(idPlayerChallengingExisting);
+		final int properSize = 5;
+
+		//then
+		Assert.assertEquals(properSize, resultList.size());
+		for (PlayerStatisticsEntity player : resultList) {
+			if (player.getLevel() == Level.MASTER) {
+				Assert.assertEquals(rankingPositionMaster, player.getRankingPosition());
+			}
+			if (player.getLevel() == Level.CHUCK_NORRIS_OF_CHESS) {
+				Assert.assertEquals(rankingPositionChuckNorris, player.getRankingPosition());
+			}
+		}
+	}
+	
+	@Test
+	public void testShouldReturnListWithoutChallengingPlayerWhenGettingMatchingPlayers() throws Exception {
+		//given
+		final long idPlayerChallengingExistingLevelChuckNorris = 14L;
+		final int properSize = 2;
+		
+		//when
+		List<PlayerStatisticsEntity> resultList = challengeService.getMatchingPlayers(idPlayerChallengingExistingLevelChuckNorris);
+		boolean isListContainingChallengingPlayer = false;
+		for (PlayerStatisticsEntity player : resultList) {
+			if (player.getId() == idPlayerChallengingExistingLevelChuckNorris) {
+				isListContainingChallengingPlayer = true;
+			}
+		}
+		
+		//then
+		Assert.assertFalse(isListContainingChallengingPlayer);
+		Assert.assertEquals(properSize, resultList.size());
+	}
+	
+	@Test
+	public void testShouldReturnListOfMatchingPlayersWithFilledBenefitLoss() throws Exception {
+		//given
+		final long idPlayerChallengingExisting = 12L;
+		
+		//when
+		List<PlayerStatisticsEntity> resultList = challengeService.getMatchingPlayers(idPlayerChallengingExisting);
+		final int properSize = 5;
+		
+		//then
+		for (PlayerStatisticsEntity player : resultList) {
+			Assert.assertTrue(player.getPotentialBenefitForChallengingPlayer() > 0);
+			Assert.assertTrue(player.getPotentialLossForChallengingPlayer() > 0);
+		}
+		Assert.assertEquals(properSize, resultList.size());
+	}
+	
+	@Transactional
+	@Test
+	public void testShouldThrowExceptionWhenGettingMatchingPlayers() throws Exception {
+		//given
+		final long idPlayerChallengingNotExisting = 5743234L;
+
+		//then
+		thrown.expect(PlayerNotExistException.class);
+		thrown.expectMessage(" does not exist anymore.");
+		
+		//when
+		challengeService.getMatchingPlayers(idPlayerChallengingNotExisting);
+	}
 
 	@Test
-	public void shouldThrowExceptionBecauseChallengeNotExist() throws Exception {
+	public void testShouldThrowExceptionBecauseChallengeNotExist() throws Exception {
 		//given
 		long idChallengeNotExisting = 146L;
 		
@@ -266,12 +246,9 @@ public class ChallengeServiceTest {
 		challengeService.acceptChallenge(idChallengeNotExisting);
 	}
 
-	/**TestCase 11. Accepting challenge, when some of the involved players' level has changed, 
-	 * should lead to throwing @ChallengeIsNoLongerValidException. 
-	 */
 	@Transactional
 	@Test
-	public void shouldThrowExceptionBecauseChallengingPlayerLevelChanged() throws Exception {
+	public void testShouldThrowExceptionBecauseChallengingPlayerLevelChanged() throws Exception {
 		//given
 		final long idChallengeExisting = 27L;
 		ChallengeEntity challenge = challengeRepository.findOne(idChallengeExisting);
@@ -290,7 +267,7 @@ public class ChallengeServiceTest {
 	
 	@Transactional
 	@Test
-	public void shouldThrowExceptionBecauseChallengedPlayerLevelChanged() throws Exception {
+	public void testShouldThrowExceptionBecauseChallengedPlayerLevelChanged() throws Exception {
 		//given
 		final long idChallengeExisting = 27L;
 		ChallengeEntity challenge = challengeRepository.findOne(idChallengeExisting);
@@ -309,7 +286,7 @@ public class ChallengeServiceTest {
 	
 	@Transactional
 	@Test
-	public void shouldThrowExceptionBecauseBothPlayersLevelsChanged() throws Exception {
+	public void testShouldThrowExceptionBecauseBothPlayersLevelsChanged() throws Exception {
 		//given
 		final long idChallengeExisting = 27L;
 		ChallengeEntity challenge = challengeRepository.findOne(idChallengeExisting);
@@ -328,11 +305,7 @@ public class ChallengeServiceTest {
 		//then
 		challengeService.acceptChallenge(idChallengeExisting);
 	}
-//	
-	/**TestCase 12. Retrieving list of challenges, which were sent by specific player,
-	 * should always return some list with ChallengesTO. If there are no such challenges,
-	 * the list should be empty.
-	 */
+
 	@Test
 	public void testShouldReturnListWithSentChallenges() {
 		//given
@@ -400,23 +373,75 @@ public class ChallengeServiceTest {
 		//then
 		Assert.assertTrue(isListEmpty);
 	}
-
-//	
-//	/**TestCase 14. Removing outdated challenges should cause deletion only of challenges,
-//	 * which are older than 7 days.
-//	 */
-//	@Test
-//	public void shouldReturnListWithChallengesWhichAreNotOutdated() {
-//		//given
-//		LocalDate earliestProperDayOfCreationChallenge = LocalDate.now().minusDays(7);
-//		//when
-//		challengeServiceTest.removeOutdatedChallenges();
-//		
-//		//then
-//		for (ChallengeTO challenge : ChallengeTOTestList.OUTDATED_CHALLENGES_TEST_LIST) {
-//			Assert.assertFalse(challenge.getDateOfChallengeCreation().isBefore(earliestProperDayOfCreationChallenge));
-//		}
-//	}
+	
+	@Transactional
+	@Test
+	public void testShouldDeleteChallengeWhenDeclineChallenge() {
+		//given
+		final long idChallengeExisting = 39L;
+		ChallengeEntity challengeToDelete = challengeRepository.findOne(idChallengeExisting);
+		List<ChallengeEntity> challengesAllBeforeDecline = challengeRepository.findAll();
+		final int challengesNumberBeforeDecline = challengesAllBeforeDecline.size();
+		
+		//when
+		challengeService.declineChallenge(challengeToDelete);
+		List<ChallengeEntity> challengesAllAfterDecline = challengeRepository.findAll();
+		
+		//then
+		Assert.assertEquals(challengesNumberBeforeDecline - 1, challengesAllAfterDecline.size());
+		Assert.assertNull(challengeRepository.findOne(idChallengeExisting));
+	}
 
 	
+	/**TestCase 14. Removing outdated challenges should cause deletion only of challenges,
+	 * which are older than 7 days.
+	 */
+	@Transactional
+	@Test
+	public void testShouldDeleteOutdatedChallenges() throws Exception {
+		//given
+		final int properDeletedChallengesNumber = 3;
+		final long idPlayerWithNoChallengesOne = 15L;
+		final long idPlayerWithNoChallengesTwo = 16L;
+		final long idPlayerWithNoChallengesThree = 17L;
+		PlayerStatisticsEntity playerWithNoChallengesOne = playerStatisticsRepository.findOne(idPlayerWithNoChallengesOne);
+		PlayerStatisticsEntity playerWithNoChallengesTwo = playerStatisticsRepository.findOne(idPlayerWithNoChallengesTwo);
+		PlayerStatisticsEntity playerWithNoChallengesThree = playerStatisticsRepository.findOne(idPlayerWithNoChallengesThree);
+		DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd"); 
+		Date dateCreatedOld = (Date) formatter.parse("2016-08-10"); 
+		
+		ChallengeEntity challengeOutdatedOne = new ChallengeEntity();
+		challengeOutdatedOne.setDateCreated(dateCreatedOld);
+		challengeOutdatedOne.setPlayerChallenging(playerWithNoChallengesOne);
+		challengeOutdatedOne.setLevelPlayerChallenging(playerWithNoChallengesOne.getLevel());
+		challengeOutdatedOne.setPlayerChallenged(playerWithNoChallengesTwo);
+		challengeOutdatedOne.setLevelPlayerChallenged(playerWithNoChallengesTwo.getLevel());
+		
+		ChallengeEntity challengeOutdatedTwo = new ChallengeEntity();
+		challengeOutdatedTwo.setDateCreated(dateCreatedOld);
+		challengeOutdatedTwo.setPlayerChallenging(playerWithNoChallengesThree);
+		challengeOutdatedTwo.setLevelPlayerChallenging(playerWithNoChallengesThree.getLevel());
+		challengeOutdatedTwo.setPlayerChallenged(playerWithNoChallengesTwo);
+		challengeOutdatedTwo.setLevelPlayerChallenged(playerWithNoChallengesTwo.getLevel());
+		
+		ChallengeEntity challengeOutdatedThree = new ChallengeEntity();
+		challengeOutdatedThree.setDateCreated(dateCreatedOld);
+		challengeOutdatedThree.setPlayerChallenging(playerWithNoChallengesTwo);
+		challengeOutdatedThree.setLevelPlayerChallenging(playerWithNoChallengesTwo.getLevel());
+		challengeOutdatedThree.setPlayerChallenged(playerWithNoChallengesOne);
+		challengeOutdatedThree.setLevelPlayerChallenged(playerWithNoChallengesOne.getLevel());
+		
+		ChallengeEntity challengeOutdatedCreatedOne = challengeRepository.save(challengeOutdatedOne);
+		ChallengeEntity challengeOutdatedCreatedTwo = challengeRepository.save(challengeOutdatedTwo);
+		ChallengeEntity challengeOutdatedCreatedThree = challengeRepository.save(challengeOutdatedThree);
+		
+		//when
+		final int resultDeletedChallengesNumber = challengeService.removeOutdatedChallenges();
+		
+		//then
+		Assert.assertEquals(properDeletedChallengesNumber, resultDeletedChallengesNumber);
+		Assert.assertEquals(challengeOutdatedCreatedOne.getDateCreated(), dateCreatedOld);
+		Assert.assertEquals(challengeOutdatedCreatedTwo.getDateCreated(), dateCreatedOld);
+		Assert.assertEquals(challengeOutdatedCreatedThree.getDateCreated(), dateCreatedOld);
+	}
 }

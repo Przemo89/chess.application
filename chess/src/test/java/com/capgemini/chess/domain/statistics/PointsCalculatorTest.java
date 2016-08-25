@@ -7,8 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.capgemini.chess.algorithms.data.enums.Level;
-import com.capgemini.chess.domain.statistics.PointsCalculator;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
+import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 
 /**TestCase 1. Calculating profit for Winning player, when difference between 
  * Losing Player (Weakling) and Winning (Advanced) is a negative number 
@@ -26,14 +25,14 @@ import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 public class PointsCalculatorTest {
 
-	private PlayerStatisticsTO winningPlayer;
-	private PlayerStatisticsTO loosingPlayer;
+	private PlayerStatisticsEntity winningPlayer;
+	private PlayerStatisticsEntity loosingPlayer;
 	private PointsCalculator statisticsTest;
 	
 	@Before
 	public void createPlayerObject() {
-		this.winningPlayer = new PlayerStatisticsTO();
-		this.loosingPlayer = new PlayerStatisticsTO();
+		this.winningPlayer = new PlayerStatisticsEntity();
+		this.loosingPlayer = new PlayerStatisticsEntity();
 	}
 	
 	@After

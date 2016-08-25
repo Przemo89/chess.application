@@ -1,11 +1,13 @@
 package com.capgemini.chess.service.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.capgemini.chess.algorithms.data.enums.Level;
 import com.capgemini.chess.dao.ChallengeDao;
 import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
@@ -17,7 +19,6 @@ import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
 import com.capgemini.chess.service.GameService;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 @Service
 @Transactional(readOnly = true)
@@ -41,18 +42,17 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public ChallengeEntity createManualChallenge(long idPlayerChallenging, long idPlayerChallenged) 
+	public ChallengeEntity createChallenge(long idPlayerChallenging, long idPlayerChallenged) 
 			throws ChallengeDataIntegrityViolationException {
 		List<PlayerStatisticsEntity> playersStatistics = challengeDao
-				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged); 
-
+				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged);
+		isPlayerChallengingHimself(idPlayerChallenging, idPlayerChallenged);
 		int playerChallengingIndexInList = setPlayerChallengingIndexInList(playersStatistics.get(0), idPlayerChallenging);
 		int playerChallengedIndexInList = setPlayerChallengedIndexInList(playerChallengingIndexInList);
+		
 		if (playersStatistics.get(playerChallengingIndexInList).getChallengesSent().isEmpty() == false 
 				&& playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0) != null) {
-			// Version has to be changed, otherwise Listeners won't be fired up and no changes will be made.
-//			playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).setVersion(
-//					playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).getVersion() + 1); 
+			// At least Date of Creation has to be changed, otherwise Listeners won't be triggered and no changes will be made.
 			playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).setDateCreated(null);
 			return challengeDao.update(playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0));
 		}
@@ -60,6 +60,13 @@ public class ChallengeServiceImpl implements ChallengeService {
 		setChallengeEntityForChallengeCreation(challenge, 
 				playersStatistics.get(playerChallengingIndexInList), playersStatistics.get(playerChallengedIndexInList));
 		return challengeDao.save(challenge);
+	}
+
+	private void isPlayerChallengingHimself(long idPlayerChallenging, long idPlayerChallenged)
+			throws ChallengeDataIntegrityViolationException {
+		if (idPlayerChallenging == idPlayerChallenged) {
+			throw new ChallengeDataIntegrityViolationException("User cannot sent challenge to himself!");
+		}
 	}
 
 	private void setChallengeEntityForChallengeCreation(ChallengeEntity challenge,
@@ -86,32 +93,57 @@ public class ChallengeServiceImpl implements ChallengeService {
 	}
 
 	/**Finds matching players during creation of challenge list (automatic)
-	 * @param idOfChallengingPlayer
+	 * @param idPlayerChallenging
 	 * @return list with at most 5 potential matching players
 	 */
 	@Override
-	public List<PlayerStatisticsEntity> getMatchingPlayers(long idOfChallengingPlayer) {
-//		List<PlayerStatisticsTO> potentialRivalPlayers = 
-//				playerStatisticsDao.getMatchingPlayersList(idOfChallengingPlayer);
-//		PlayerStatisticsTO challengingPlayer = potentialRivalPlayers.get(potentialRivalPlayers.size()-1);
-//		potentialRivalPlayers.remove(potentialRivalPlayers.size() - 1);
-//		if (potentialRivalPlayers.size() < 5) {
-//			setPotentialBenefitAndLoss(potentialRivalPlayers, challengingPlayer);
-//			return potentialRivalPlayers;
-//
-//		}
-//		Collections.shuffle(potentialRivalPlayers);
-//		List<PlayerStatisticsTO> finalListOfPlayers = new ArrayList<>();
-//		finalListOfPlayers.addAll(potentialRivalPlayers.subList(0, 5));
-//		setPotentialBenefitAndLoss(finalListOfPlayers, challengingPlayer);
-//		return finalListOfPlayers;
-		return null;
+	public List<PlayerStatisticsEntity> getMatchingPlayers(long idPlayerChallenging) 
+			throws PlayerNotExistException {
+		PlayerStatisticsEntity playerChallenging = playerStatisticsDao.findOne(idPlayerChallenging);
+		isPlayerStatisticsEntityExists(playerChallenging, idPlayerChallenging);
+		List<String> levelsString = new ArrayList<>();
+		setLevelsMatchingPlayersList(playerChallenging, levelsString);
+		List<PlayerStatisticsEntity> potentialRivalPlayers = 
+				playerStatisticsDao.getMatchingPlayersList(idPlayerChallenging, levelsString);
+		List<PlayerStatisticsEntity> finalListOfPlayers = createMatchingPlayersFinalList(playerChallenging,
+				potentialRivalPlayers);
+		setPlayersRankingPositions(finalListOfPlayers);
+		return finalListOfPlayers;
 	}
 
-	private void setPotentialBenefitAndLoss(List<PlayerStatisticsTO> potentialRivalPlayers,
-			PlayerStatisticsTO challengingPlayer) {
-		for (PlayerStatisticsTO player : potentialRivalPlayers) {
-			PointsCalculator pointCalculator = new PointsCalculator(challengingPlayer, player);
+	private void setPlayersRankingPositions(List<PlayerStatisticsEntity> finalListOfPlayers) {
+		for (PlayerStatisticsEntity playerStats : finalListOfPlayers) {
+			playerStats.setRankingPosition(playerStatisticsDao.getPlayerRankingPosition(playerStats.getPoints())+1);
+		}
+	}
+
+	private List<PlayerStatisticsEntity> createMatchingPlayersFinalList(PlayerStatisticsEntity playerChallenging,
+			List<PlayerStatisticsEntity> potentialRivalPlayers) {
+		setPotentialBenefitLossAndGetProfile(potentialRivalPlayers, playerChallenging);
+		return potentialRivalPlayers;
+	}
+
+	private void setLevelsMatchingPlayersList(PlayerStatisticsEntity playerChallenging, List<String> levels) {
+		int valueLevelPlayerChallenging = playerChallenging.getLevel().getValue();
+		for (int i = -2; i <= 2; i++) {
+			int levelValue = i + valueLevelPlayerChallenging;
+			if (levelValue > 0 && levelValue < 11) {
+				levels.add(Level.getLevelByValue(levelValue).toString());
+			}
+		}
+	}
+
+	private void isPlayerStatisticsEntityExists(PlayerStatisticsEntity playerChallenging, long idPlayerChallenging)
+			throws PlayerNotExistException {
+		if (playerChallenging == null) {
+			throw new PlayerNotExistException(idPlayerChallenging);
+		}
+	}
+
+	private void setPotentialBenefitLossAndGetProfile(List<PlayerStatisticsEntity> potentialRivalPlayers,
+			PlayerStatisticsEntity playerChallenging) {
+		for (PlayerStatisticsEntity player : potentialRivalPlayers) {
+			PointsCalculator pointCalculator = new PointsCalculator(playerChallenging, player);
 			player.setPotentialBenefitForChallengingPlayer(pointCalculator.calculateWinnerProfit());
 			player.setPotentialLossForChallengingPlayer(pointCalculator.calculateChallengingPlayerPotentialLoss());
 		}
@@ -121,8 +153,8 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * @param idChallenge - challenge's id, which is to be declined
 	 */
 	@Override
-	public void declineChallenge(long idChallenge) {
-//		challengeDao.deleteChallenge(idChallenge);
+	public void declineChallenge(ChallengeEntity challenge) {
+		challengeDao.delete(challenge);
 	}
 
 	/**Checks if challenge exist, then compares level of players from:
@@ -183,10 +215,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 	}
 	
 	/**Removes from DB all challenges, which are older than 7 seven days.
+	 * @return number of deleted challenges
 	 */
 	@Override
-	public void removeOutdatedChallenges() {
-		challengeDao.removeOutdatedChallenges();
+	@Transactional(readOnly = false)
+	public int removeOutdatedChallenges() {
+		return challengeDao.removeOutdatedChallenges();
 	}
 
 }

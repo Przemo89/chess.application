@@ -21,20 +21,8 @@ public interface ChallengeDao extends Dao<ChallengeEntity, Long> {
 	List<ChallengeEntity> getPlayersSentChallenges(long idPlayer);
 	List<ChallengeEntity> getPlayersReceivedChallenges(long idPlayer);
 	
-	/**Removes provided challenge record from DB.
-	 * @param idChallenge
-	 */
-	void deleteChallenge(ChallengeEntity challenge);
-	
-//	/**Puts new challenge record in DB.
-//	 * @param manualChallengeToSet - challenge, which was validated first by service
-//	 * @throws PlayerNotExistException - in case some of the player's id was not found is DB.
-//	 */
-//	void setChallenge(ChallengeEntity manualChallengeToSet) throws PlayerNotExistException;
-	
 	/**Removes from DB all challenges, which are older than 7 seven days.
+	 * @return number of deleted challenges
 	 */
-	void removeOutdatedChallenges();
-	
-//	int updateChallengeDatesCreationAndLastModification(long idChallenge);
+	int removeOutdatedChallenges();
 }

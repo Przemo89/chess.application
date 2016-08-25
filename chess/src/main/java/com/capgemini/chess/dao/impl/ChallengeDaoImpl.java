@@ -2,6 +2,7 @@ package com.capgemini.chess.dao.impl;
 
 import java.util.List;
 
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.stereotype.Repository;
@@ -55,32 +56,10 @@ public class ChallengeDaoImpl extends AbstractDao<ChallengeEntity, Long> impleme
 	}
 
 	@Override
-	public void deleteChallenge(ChallengeEntity challenge) {
-		challenge = entityManager.merge(challenge);
-		entityManager.remove(challenge);
-		// TODO Auto-generated method stub
+	public int removeOutdatedChallenges() {
+		Query query = entityManager.createQuery(
+				"delete from ChallengeEntity challenges where "
+				+ "timestampdiff(sql_tsi_day, date_creation, curdate()) > 7");
+		return query.executeUpdate();
 	}
-
-//	@Override
-//	public void setChallenge(ChallengeEntity manualChallengeToSet) throws PlayerNotExistException {
-//		// TODO Auto-generated method stub
-//		
-//	}
-
-	@Override
-	public void removeOutdatedChallenges() {
-		// TODO Auto-generated method stub
-		
-	}
-
-//	@Override
-//	public int updateChallengeDatesCreationAndLastModification(long idChallenge) {
-//		// TODO Auto-generated method stub
-//		Query query = entityManager.createQuery("update ChallengeEntity c set date_creation = current_timestamp() "
-//				+ "where id = :id");
-//		query.setParameter("id", idChallenge);
-//		query.executeUpdate();
-//		return 0;
-//	}
-
 }

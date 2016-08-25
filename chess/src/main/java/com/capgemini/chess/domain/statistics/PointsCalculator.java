@@ -1,8 +1,8 @@
 package com.capgemini.chess.domain.statistics;
 
 import com.capgemini.chess.algorithms.data.enums.Level;
+import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.InvalidValueException;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 public class PointsCalculator {
 	
@@ -10,15 +10,15 @@ public class PointsCalculator {
 	 * time ChallengeService will want to get potential profit/loss for specific players.
 	 * StatisticsPointCounter should be singleton, no need to do it in other way.
 	 */
-	private PlayerStatisticsTO winningPlayer;
-	private PlayerStatisticsTO loosingPlayer;
+	private PlayerStatisticsEntity winningPlayer;
+	private PlayerStatisticsEntity loosingPlayer;
 	
-	public PointsCalculator(PlayerStatisticsTO winningPlayer, PlayerStatisticsTO losingPlayer) {
+	public PointsCalculator(PlayerStatisticsEntity winningPlayer, PlayerStatisticsEntity losingPlayer) {
 		this.winningPlayer = winningPlayer;
 		this.loosingPlayer = losingPlayer;
 	}
 	
-	private double calculateProgressPoints(PlayerStatisticsTO player) {
+	private double calculateProgressPoints(PlayerStatisticsEntity player) {
 		if (player.getLevel() == Level.CHUCK_NORRIS_OF_CHESS) {
 			return 0.0;
 		}
@@ -32,7 +32,7 @@ public class PointsCalculator {
 	 * @param adjustLevelValue - method first gets player's current level and add adjustLevelValue.
 	 * @return required points for adjusted level.
 	 */
-	private double returnPointsPerRequiredLevel(PlayerStatisticsTO player, int adjustLevelValue) {
+	private double returnPointsPerRequiredLevel(PlayerStatisticsEntity player, int adjustLevelValue) {
 		checkAdjustedValue(adjustLevelValue);
 		if (player.getLevel().getValue() + adjustLevelValue > 10) {
 			return Level.CHUCK_NORRIS_OF_CHESS.getPointsRequired();
@@ -51,7 +51,7 @@ public class PointsCalculator {
 		}
 	}
 	
-	private double calculateProgressGames(PlayerStatisticsTO player) {
+	private double calculateProgressGames(PlayerStatisticsEntity player) {
 		if (player.getLevel() == Level.CHUCK_NORRIS_OF_CHESS) {
 			return 0.0;
 		}
@@ -65,7 +65,7 @@ public class PointsCalculator {
 	 * @param adjustLevelValue - method first gets player's current level and add adjustLevelValue.
 	 * @return required number of played games for adjusted level.
 	 */
-	private double returnGamesPerRequiredLevel(PlayerStatisticsTO player, int adjustLevelValue) {
+	private double returnGamesPerRequiredLevel(PlayerStatisticsEntity player, int adjustLevelValue) {
 		checkAdjustedValue(adjustLevelValue);
 		if (player.getLevel().getValue() + adjustLevelValue > 10) {
 			return Level.CHUCK_NORRIS_OF_CHESS.getGamesRequired();
@@ -74,7 +74,7 @@ public class PointsCalculator {
 		return games;
 	}
 	
-	private double calculateProgressWins(PlayerStatisticsTO player) {
+	private double calculateProgressWins(PlayerStatisticsEntity player) {
 		if (player.getLevel() == Level.CHUCK_NORRIS_OF_CHESS || player.getLevel() == Level.NEWBIE) {
 			return 0.0;
 		}
@@ -91,7 +91,7 @@ public class PointsCalculator {
 	 * @param adjustLevelValue - method first gets player's current level and add adjustLevelValue.
 	 * @return required number of wins for adjusted level.
 	 */
-	private double returnWinsPerRequiredLevel(PlayerStatisticsTO player, int adjustLevelValue) {
+	private double returnWinsPerRequiredLevel(PlayerStatisticsEntity player, int adjustLevelValue) {
 		checkAdjustedValue(adjustLevelValue);
 		if (player.getLevel().getValue() + adjustLevelValue > 10) {
 			return Level.CHUCK_NORRIS_OF_CHESS.getWinsRequired();
@@ -100,7 +100,7 @@ public class PointsCalculator {
 		return wins;
 	}
 	
-	private double calculateProgress(PlayerStatisticsTO player) {
+	private double calculateProgress(PlayerStatisticsEntity player) {
 		if (player.getLevel() == Level.CHUCK_NORRIS_OF_CHESS) {
 			return 0.0;
 		}
@@ -111,13 +111,13 @@ public class PointsCalculator {
 		return progress;
 	}
 	
-	private int calculateBonusForWinner(PlayerStatisticsTO winningPlayer, PlayerStatisticsTO loosingPlayer, int baseProfit) {
+	private int calculateBonusForWinner(PlayerStatisticsEntity winningPlayer, PlayerStatisticsEntity loosingPlayer, int baseProfit) {
 		double progressDifference = calculateProgress(loosingPlayer) - calculateProgress(winningPlayer);
 		int result = (int) Math.floor(progressDifference*baseProfit*0.5);
 		return result;
 	}
 	
-	private int calculateBaseProfit(PlayerStatisticsTO winningPlayer, PlayerStatisticsTO loosingPlayer) {
+	private int calculateBaseProfit(PlayerStatisticsEntity winningPlayer, PlayerStatisticsEntity loosingPlayer) {
 		int baseProfit = 0;
 		int levelDifference = loosingPlayer.getLevel().getValue() - winningPlayer.getLevel().getValue();
 		if (levelDifference <= -5) {
@@ -133,13 +133,13 @@ public class PointsCalculator {
 		return baseProfit;
 	}
 	
-	private int calculateBonusForLoser(PlayerStatisticsTO winningPlayer, PlayerStatisticsTO loosingPlayer, int baseLoss) {
+	private int calculateBonusForLoser(PlayerStatisticsEntity winningPlayer, PlayerStatisticsEntity loosingPlayer, int baseLoss) {
 		double progressDifference = calculateProgress(winningPlayer) - calculateProgress(loosingPlayer);
 		int result = (int) Math.floor(progressDifference*baseLoss*0.5);
 		return result;
 	}
 	
-	private int calculateBaseLoss(PlayerStatisticsTO winningPlayer, PlayerStatisticsTO loosingPlayer) {
+	private int calculateBaseLoss(PlayerStatisticsEntity winningPlayer, PlayerStatisticsEntity loosingPlayer) {
 		int baseLoss = 0;
 		int levelDifference = loosingPlayer.getLevel().getValue() - winningPlayer.getLevel().getValue();
 		if (levelDifference <= -4) {

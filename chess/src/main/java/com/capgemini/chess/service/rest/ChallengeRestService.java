@@ -13,13 +13,15 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
+import com.capgemini.chess.service.mapper.PlayerMatchingMapper;
 import com.capgemini.chess.service.to.ChallengeTO;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
+import com.capgemini.chess.service.to.PlayerMatchingTO;
 
 @RequestMapping("/chess/challenge")
 @RestController
@@ -32,7 +34,7 @@ public class ChallengeRestService {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void createManualChallenge(@PathVariable(value = "idChallenger") final long idOfChallengingPlayer, 
 			@PathVariable(value = "idChallenged") final long idOfChallengedPlayer) throws ChallengeDataIntegrityViolationException {
-		challengeService.createManualChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
+		challengeService.createChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
 	}
 	
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Player in this challenge does not exist.")
@@ -43,13 +45,13 @@ public class ChallengeRestService {
 	
 	@RequestMapping(value = "/automatic/getMatchingPlayers/{idRequestingPlayer}", method = RequestMethod.GET,
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<PlayerStatisticsTO>> getMatchingPlayers(@PathVariable
-			(value = "idRequestingPlayer") final long idOfChallengingPlayer) {
-		List<PlayerStatisticsTO> matchingPlayers = challengeService.getMatchingPlayers(idOfChallengingPlayer);
+	public ResponseEntity<List<PlayerMatchingTO>> getMatchingPlayers(@PathVariable
+			(value = "idRequestingPlayer") final long idOfChallengingPlayer) throws PlayerNotExistException {
+		List<PlayerMatchingTO> matchingPlayers = PlayerMatchingMapper.map2TOs(challengeService.getMatchingPlayers(idOfChallengingPlayer));
 		if (matchingPlayers.isEmpty()) {
-			return new ResponseEntity<List<PlayerStatisticsTO>>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<List<PlayerMatchingTO>>(HttpStatus.NO_CONTENT);
 		}
-		return new ResponseEntity<List<PlayerStatisticsTO>>(matchingPlayers, HttpStatus.OK);
+		return new ResponseEntity<List<PlayerMatchingTO>>(matchingPlayers, HttpStatus.OK);
 	}
 	
 	/**Declines challenge - in this case such challenge is simply removed from DB,
@@ -61,7 +63,8 @@ public class ChallengeRestService {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void declineChallenge(@PathVariable(value = "idChallenge") 
 			final long idChallenge) {
-		challengeService.declineChallenge(idChallenge);
+		ChallengeEntity challengeToDelete;
+		challengeService.declineChallenge(challengeToDelete);
 	}
 	
 	@RequestMapping(value = "/accept/{idChallenge}", method = RequestMethod.POST)

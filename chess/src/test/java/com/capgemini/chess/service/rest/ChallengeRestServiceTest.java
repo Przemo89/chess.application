@@ -95,7 +95,7 @@ public class ChallengeRestServiceTest {
 		
 		// when
 		Mockito.doThrow(new PlayerNotExistException()).when(challengeService)
-				.createManualChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
+				.createChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
 		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/" + idOfChallengingPlayer
 				+ "/" + idOfChallengedPlayer));
 

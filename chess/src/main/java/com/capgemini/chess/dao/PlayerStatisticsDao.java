@@ -14,5 +14,7 @@ public interface PlayerStatisticsDao extends Dao<PlayerStatisticsEntity, Long> {
 	 * has not been found in DB.
 	 * @return full list of potential rivals.
 	 */
-	List<PlayerStatisticsEntity> getMatchingPlayersList(long idOfChallengingPlayer) throws PlayerNotExistException;
+	List<PlayerStatisticsEntity> getMatchingPlayersList(long idPlayerChallenging, List<String> levelsString);
+	
+	Long getPlayerRankingPosition(int playerPoints);
 }

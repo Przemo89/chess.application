@@ -8,6 +8,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
+import com.capgemini.chess.exception.PlayerNotExistException;
 @Scope(proxyMode = ScopedProxyMode.INTERFACES)
 public interface ChallengeService {
 
@@ -18,19 +19,19 @@ public interface ChallengeService {
 	 * @param idOfChallengedPlayer
 	 * @return challenge entity which was saved or updated.
 	 */
-	ChallengeEntity createManualChallenge(long idChallengingPlayer, long idChallengedPlayer) 
+	ChallengeEntity createChallenge(long idChallengingPlayer, long idChallengedPlayer) 
 			throws ChallengeDataIntegrityViolationException;
 	
 	/**Finds matching players during creation of challenge list (automatic)
-	 * @param idOfChallengingPlayer
+	 * @param idPlayerChallenging
 	 * @return list with at most 5 potential matching players
 	 */
-	List<PlayerStatisticsEntity> getMatchingPlayers(long idOfChallengingPlayer);
+	List<PlayerStatisticsEntity> getMatchingPlayers(long idPlayerChallenging) throws PlayerNotExistException;
 	
 	/**Removes record containing specific challenge from DB through ChallengeDAO.
-	 * @param idChallenge - challenge's id, which is to be declined
+	 * @param challenge - challenge, which is to be declined
 	 */
-	void declineChallenge(long idChallenge);
+	void declineChallenge(ChallengeEntity challenge);
 	
 	/**Checks if challenge exist, then compares level of players from:
 	 * 1. Moment when challenge has been created (from ChallengeEntity)
@@ -58,8 +59,8 @@ public interface ChallengeService {
 	List<ChallengeEntity> getReceivedChallenges(long idPlayer);
 	
 	/**Removes from DB all challenges, which are older than 7 seven days.
+	 * @return number of deleted challenges
 	 */
-	void removeOutdatedChallenges();
+	int removeOutdatedChallenges();
 	
-//	List<ChallengeEntity> findAllChallenges();
 }

@@ -10,8 +10,8 @@ import org.junit.rules.ExpectedException;
 
 import com.capgemini.chess.algorithms.data.enums.GameResult;
 import com.capgemini.chess.algorithms.data.enums.Level;
+import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.InvalidGameResultException;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 /**TestCase 1. Attempt to set game result for both players as WON should throw @InvalidGameResultException.
  * TestCase 2. Attempt to set game result for both players as LOST should throw @InvalidGameResultException.
@@ -26,8 +26,8 @@ import com.capgemini.chess.service.to.PlayerStatisticsTO;
  */
 public class PlayersStatisticsUpdateTest {
 
-	private PlayerStatisticsTO playerOne;
-	private PlayerStatisticsTO playerTwo;
+	private PlayerStatisticsEntity playerOne;
+	private PlayerStatisticsEntity playerTwo;
 	private GameResult gameResultForPlayerOne;
 	private GameResult gameResultForLoosingTwo;
 	private PlayersStatisticsUpdate test;
@@ -37,8 +37,8 @@ public class PlayersStatisticsUpdateTest {
 	
 	@Before
 	public void instantiatePlayerObjects() {
-		playerOne = new PlayerStatisticsTO();
-		playerTwo = new PlayerStatisticsTO();
+		playerOne = new PlayerStatisticsEntity();
+		playerTwo = new PlayerStatisticsEntity();
 		playerOne.setLevel(Level.ADVANCED);
 		playerOne.setGamesPlayed(200);
 		playerOne.setPoints(12000);

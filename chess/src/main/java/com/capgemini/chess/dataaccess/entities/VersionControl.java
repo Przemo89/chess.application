@@ -27,7 +27,9 @@ public abstract class VersionControl {
 	
 	@PrePersist
 	public void setDatesBeforePersist() {
-		this.dateCreated = new Date();
+		if (this.dateCreated == null) {
+			this.dateCreated = new Date();
+		}
 		this.dateLastModified = new Date();
 	}
 	

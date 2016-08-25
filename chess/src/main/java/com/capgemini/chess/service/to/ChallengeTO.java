@@ -1,60 +1,27 @@
 package com.capgemini.chess.service.to;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import com.capgemini.chess.algorithms.data.enums.Level;
 
 public class ChallengeTO {
 
 	private long idChallenge;
-	private long idOfChallengingPlayer;
-	private long idOfChallengedPlayer;
-	private Level levelOfChallengingPlayer;
-	private Level levelOfChallengedPlayer;
-	private LocalDate dateOfChallengeCreation;
-	private PlayerStatisticsTO challengingPlayer;
-	private PlayerStatisticsTO challengedPlayer;
-
-	public ChallengeTO(long idChallenge, long idOfChallengingPlayer, long idOfChallengedPlayer,
-			Level levelOfChallengingPlayer, Level levelOfChallengedPlayer, LocalDate dateOfChallengeCreation,
-			PlayerStatisticsTO challengingPlayer, PlayerStatisticsTO challengedPlayer) {
-		this.idChallenge = idChallenge;
-		this.idOfChallengingPlayer = idOfChallengingPlayer;
-		this.idOfChallengedPlayer = idOfChallengedPlayer;
-		this.levelOfChallengingPlayer = levelOfChallengingPlayer;
-		this.levelOfChallengedPlayer = levelOfChallengedPlayer;
-		this.dateOfChallengeCreation = dateOfChallengeCreation;
-		this.challengingPlayer = challengingPlayer;
-		this.challengedPlayer = challengedPlayer;
-	}
+	private Level levelPlayerChallenged;
+	private int pointsPlayerChallenged;
+	private int gamesPlayedPlayerChallenged;
+	private int gamesWonPlayerChallenged;
+	private int gamesDrawnPlayerChallenged;
+	private int gamesLostPlayerChallenged;
+	private Date dateCreationChallenge;
+	private int potentialBenefitForChallengingPlayer;
+	private int potentialLossForChallengingPlayer;
+	private String loginPlayerChallenged;
+	private String namePlayerChallenged;
 	
 	public ChallengeTO() {
 		
 	}
-	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ChallengeTO other = (ChallengeTO) obj;
-		if (challengedPlayer == null) {
-			if (other.challengedPlayer != null)
-				return false;
-		} else if (!challengedPlayer.equals(other.challengedPlayer))
-			return false;
-		if (challengingPlayer == null) {
-			if (other.challengingPlayer != null)
-				return false;
-		} else if (!challengingPlayer.equals(other.challengingPlayer))
-			return false;
-		return true;
-	}
-
-
 
 	public long getIdChallenge() {
 		return idChallenge;
@@ -64,60 +31,91 @@ public class ChallengeTO {
 		this.idChallenge = idChallenge;
 	}
 
-	public long getIdOfChallengingPlayer() {
-		return idOfChallengingPlayer;
+	public Level getLevelPlayerChallenged() {
+		return levelPlayerChallenged;
 	}
 
-	public void setIdOfChallengingPlayer(long idOfChallengingPlayer) {
-		this.idOfChallengingPlayer = idOfChallengingPlayer;
+	public void setLevelPlayerChallenged(Level levelPlayerChallenged) {
+		this.levelPlayerChallenged = levelPlayerChallenged;
 	}
 
-	public long getIdOfChallengedPlayer() {
-		return idOfChallengedPlayer;
+	public Date getDateCreationChallenge() {
+		return dateCreationChallenge;
 	}
 
-	public void setIdOfChallengedPlayer(long idOfChellengedPlayer) {
-		this.idOfChallengedPlayer = idOfChellengedPlayer;
+	public void setDateCreationChallenge(Date dateCreationChallenge) {
+		this.dateCreationChallenge = dateCreationChallenge;
 	}
 
-	public Level getLevelOfChallengingPlayer() {
-		return levelOfChallengingPlayer;
+	public int getPotentialBenefitForChallengingPlayer() {
+		return potentialBenefitForChallengingPlayer;
 	}
 
-	public void setLevelOfChallengingPlayer(Level levelOfChallengingPlayer) {
-		this.levelOfChallengingPlayer = levelOfChallengingPlayer;
+	public void setPotentialBenefitForChallengingPlayer(int potentialBenefitForChallengingPlayer) {
+		this.potentialBenefitForChallengingPlayer = potentialBenefitForChallengingPlayer;
 	}
 
-	public Level getLevelOfChallengedPlayer() {
-		return levelOfChallengedPlayer;
+	public int getPotentialLossForChallengingPlayer() {
+		return potentialLossForChallengingPlayer;
 	}
 
-	public void setLevelOfChallengedPlayer(Level levelOfChallengedPlayer) {
-		this.levelOfChallengedPlayer = levelOfChallengedPlayer;
+	public void setPotentialLossForChallengingPlayer(int potentialLossForChallengingPlayer) {
+		this.potentialLossForChallengingPlayer = potentialLossForChallengingPlayer;
 	}
 
-	public LocalDate getDateOfChallengeCreation() {
-		return dateOfChallengeCreation;
+	public String getLoginPlayerChallenged() {
+		return loginPlayerChallenged;
 	}
 
-	public void setDateOfChallengeCreation(LocalDate dateOfChallengeCreation) {
-		this.dateOfChallengeCreation = dateOfChallengeCreation;
+	public void setLoginPlayerChallenged(String loginPlayerChallenged) {
+		this.loginPlayerChallenged = loginPlayerChallenged;
+	}
+
+	public String getNamePlayerChallenged() {
+		return namePlayerChallenged;
+	}
+
+	public void setNamePlayerChallenged(String namePlayerChallenged) {
+		this.namePlayerChallenged = namePlayerChallenged;
 	}
 	
-	public PlayerStatisticsTO getChallengingPlayer() {
-		return challengingPlayer;
+	public int getPointsPlayerChallenged() {
+		return pointsPlayerChallenged;
 	}
 
-	public void setChallengingPlayer(PlayerStatisticsTO challengingPlayer) {
-		this.challengingPlayer = challengingPlayer;
+	public void setPointsPlayerChallenged(int pointsPlayerChallenged) {
+		this.pointsPlayerChallenged = pointsPlayerChallenged;
 	}
 
-	public PlayerStatisticsTO getChallengedPlayer() {
-		return challengedPlayer;
+	public int getGamesPlayedPlayerChallenged() {
+		return gamesPlayedPlayerChallenged;
 	}
 
-	public void setChallengedPlayer(PlayerStatisticsTO challengedPlayer) {
-		this.challengedPlayer = challengedPlayer;
+	public void setGamesPlayedPlayerChallenged(int gamesPlayedPlayerChallenged) {
+		this.gamesPlayedPlayerChallenged = gamesPlayedPlayerChallenged;
 	}
 
+	public int getGamesWonPlayerChallenged() {
+		return gamesWonPlayerChallenged;
+	}
+
+	public void setGamesWonPlayerChallenged(int gamesWonPlayerChallenged) {
+		this.gamesWonPlayerChallenged = gamesWonPlayerChallenged;
+	}
+
+	public int getGamesDrawnPlayerChallenged() {
+		return gamesDrawnPlayerChallenged;
+	}
+
+	public void setGamesDrawnPlayerChallenged(int gamesDrawnPlayerChallenged) {
+		this.gamesDrawnPlayerChallenged = gamesDrawnPlayerChallenged;
+	}
+
+	public int getGamesLostPlayerChallenged() {
+		return gamesLostPlayerChallenged;
+	}
+
+	public void setGamesLostPlayerChallenged(int gamesLostPlayerChallenged) {
+		this.gamesLostPlayerChallenged = gamesLostPlayerChallenged;
+	}
 }

@@ -67,7 +67,7 @@ public class PlayerStatisticsEntity extends VersionControl implements Serializab
 	private int potentialLossForChallengingPlayer;
 	
 	@Transient
-	private int rankingPosition;
+	private long rankingPosition;
 	
 	public PlayerStatisticsEntity() {
 		
@@ -169,11 +169,11 @@ public class PlayerStatisticsEntity extends VersionControl implements Serializab
 		this.potentialLossForChallengingPlayer = potentialLossForChallengingPlayer;
 	}
 
-	public int getRankingPosition() {
+	public long getRankingPosition() {
 		return rankingPosition;
 	}
 
-	public void setRankingPosition(int rankingPosition) {
+	public void setRankingPosition(long rankingPosition) {
 		this.rankingPosition = rankingPosition;
 	}
 

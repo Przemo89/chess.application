@@ -1,13 +1,9 @@
 package com.capgemini.chess.domain.statistics;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.capgemini.chess.algorithms.data.enums.GameResult;
 import com.capgemini.chess.algorithms.data.enums.Level;
-import com.capgemini.chess.exception.InsufficientDataProvidedException;
+import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.InvalidGameResultException;
-import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 /**
  * This class will update Player's statistics. Here is only one public method
@@ -21,14 +17,14 @@ import com.capgemini.chess.service.to.PlayerStatisticsTO;
 
 public class PlayersStatisticsUpdate {
 
-	private PlayerStatisticsTO winningPlayer;
-	private PlayerStatisticsTO loosingPlayer;
+	private PlayerStatisticsEntity winningPlayer;
+	private PlayerStatisticsEntity loosingPlayer;
 	private final boolean isDraw;
 	private boolean isStatisticAlreadyUpdated = false;
 	private PointsCalculator statistics;
 
-	public PlayersStatisticsUpdate(PlayerStatisticsTO whitePiecesPlayer, GameResult gameResultForWhitePiecesPlayer,
-			PlayerStatisticsTO blackPiecesPlayer, GameResult gameResultForBlackPiecesPlayer) {
+	public PlayersStatisticsUpdate(PlayerStatisticsEntity whitePiecesPlayer, GameResult gameResultForWhitePiecesPlayer,
+			PlayerStatisticsEntity blackPiecesPlayer, GameResult gameResultForBlackPiecesPlayer) {
 		checkInputDataCorectness(gameResultForWhitePiecesPlayer, gameResultForBlackPiecesPlayer);
 		if (gameResultForWhitePiecesPlayer == GameResult.DRAW) {
 			this.isDraw = true;
@@ -49,8 +45,8 @@ public class PlayersStatisticsUpdate {
 	 * @param blackPiecesPlayer
 	 * @param gameResultForBlackPiecesPlayer
 	 */
-	private void setWinningAndLoosingPlayer(PlayerStatisticsTO whitePiecesPlayer, GameResult gameResultForWhitePiecesPlayer,
-			PlayerStatisticsTO blackPiecesPlayer, GameResult gameResultForBlackPiecesPlayer) {
+	private void setWinningAndLoosingPlayer(PlayerStatisticsEntity whitePiecesPlayer, GameResult gameResultForWhitePiecesPlayer,
+			PlayerStatisticsEntity blackPiecesPlayer, GameResult gameResultForBlackPiecesPlayer) {
 		if (gameResultForWhitePiecesPlayer == GameResult.WON) {
 			this.winningPlayer = whitePiecesPlayer;
 			this.loosingPlayer = blackPiecesPlayer;
@@ -125,7 +121,7 @@ public class PlayersStatisticsUpdate {
 		determinePlayersNewLevel(this.loosingPlayer);
 	}
 
-	private void determinePlayersNewLevel(PlayerStatisticsTO playerToUpdate) {
+	private void determinePlayersNewLevel(PlayerStatisticsEntity playerToUpdate) {
 		double playerWins = (double) playerToUpdate.getGamesWon() / playerToUpdate.getGamesPlayed();
 		for (int i = 10; i >= 1; i--) {
 			if (playerToUpdate.getPoints() >= Level.getLevelByValue(i).getPointsRequired()) {

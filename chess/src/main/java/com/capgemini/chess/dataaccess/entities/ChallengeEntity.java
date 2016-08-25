@@ -25,7 +25,6 @@ import com.capgemini.chess.algorithms.data.enums.Level;
 @Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public class ChallengeEntity extends VersionControl implements Serializable {
 
-
 	private static final long serialVersionUID = 16754467L;
 
 	@Id
