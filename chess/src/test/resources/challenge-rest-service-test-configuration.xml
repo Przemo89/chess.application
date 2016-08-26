@@ -33,9 +33,10 @@
 		</property>
 	</bean>
 	
-	<bean id = "challengeDao" class="com.capgemini.chess.dao.impl.ChallengeDaoImpl"></bean>
+	<bean id = "challengeDao" class="com.capgemini.chess.dao.impl.ChallengeDaoImpl" />
 	
-<!-- 	<bean id="challengeService" class=""></bean> -->
+	<bean id = "playerStatisticsDao" class="com.capgemini.chess.dao.impl.PlayerStatisticsDaoImpl" />
+	
  	<bean class="org.mockito.Mockito" factory-method="mock">
 		<constructor-arg value="com.capgemini.chess.service.ChallengeService" />
 	</bean> 

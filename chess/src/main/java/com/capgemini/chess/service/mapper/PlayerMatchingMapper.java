@@ -11,18 +11,20 @@ public class PlayerMatchingMapper {
 	public static PlayerMatchingTO map(PlayerStatisticsEntity playerStats) {
 		if (playerStats != null && playerStats.getPlayerProfile() != null) {
 			PlayerMatchingTO playerMatchingTo = new PlayerMatchingTO();
+			playerMatchingTo.setId(playerStats.getId());
 			playerMatchingTo.setLevel(playerStats.getLevel());
 			playerMatchingTo.setPoints(playerStats.getPoints());
 			playerMatchingTo.setGamesPlayed(playerStats.getGamesPlayed());
 			playerMatchingTo.setGamesWon(playerStats.getGamesWon());
 			playerMatchingTo.setGamesDrawn(playerStats.getGamesDrawn());
 			playerMatchingTo.setGamesLost(playerStats.getGamesLost());
-			playerMatchingTo.setPotentialBenefitForChallengingPlayer(playerMatchingTo.getPotentialBenefitForChallengingPlayer());
+			playerMatchingTo.setPotentialBenefitForChallengingPlayer(playerStats.getPotentialBenefitForChallengingPlayer());
 			playerMatchingTo.setPotentialLossForChallengingPlayer(playerStats.getPotentialLossForChallengingPlayer());
 			playerMatchingTo.setRankingPosition(playerStats.getRankingPosition());
 			playerMatchingTo.setLogin(playerStats.getPlayerProfile().getLogin());
 			playerMatchingTo.setFirstName(playerStats.getPlayerProfile().getFirstName());
 			playerMatchingTo.setLastName(playerStats.getPlayerProfile().getLastName());
+			return playerMatchingTo;
 		}
 		return null;
 	}

@@ -27,51 +27,10 @@ import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeCreationException;
-import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
 import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
-
-
-/**TestCase 1. Creation of manual challenge - if challenge already exists in
- * @ChallengeTOTestList.PROPER_CHALLENGES_TO_TEST_LIST, then it should be only updated 
- * with players' current levels and date.
- * TestCase 2. Creation of manual challenge - if challenge does not exist in
- * @ChallengeTOTestList.PROPER_CHALLENGES_TO_TEST_LIST, then this ChallengeTO should be added 
- * to @ChallengeTOTestList.TEST_LIST_FOR_INSERTION_ONLY.
- * TestCase 3. Creation of manual challenge - any of Players does not exist in
- * @PlayerStatisticsTOTestList.PLAYER_STATISTICS_TO_TEST_LIST, then should be thrown 
- * @PlayerNotExistException. 
- * to @ChallengeTOTestList.TEST_LIST_FOR_INSERTION_ONLY.
- * TestCase 4. Finding matching players for automatic challenge for specific requesting 
- * player should return list with maximum 5 entries, with players which have 
- * +2/+1/+0/-1/-2 levels in regard to requesting player.
- * TestCase 5. Finding matching players for automatic challenge for specific requesting 
- * player should return list without challenging player.
- * TestCase 6. Found matching players for automatic challenge for specific requesting 
- * player should have set up potential benefit/loss for challenging player.
- * Tests of calculation of benefit/profit has been created in @PointsCalculatorTest.
- * TestCase 7. If during finding matching players procedure challenging player won't be found
- * in DB, @PlayerNotExistException should be thrown.
- * TestCase 8. Accepting challenge, when both players' levels didn't change and they still exist in DB,
- * should lead to usage of @GameService.startMatch() method. Also, the challenge should 
- * be removed from DB.
- * TestCase 9. Accepting challenge, which has been deleted earlier from DB, 
- * should lead to throwing @ChallengeNotExistException.
- * TestCase 10. Accepting challenge, when some of the involved player does not exist anymore, 
- * should lead to throwing @PlayerNotExistException.
- * TestCase 11. Accepting challenge, when some of the involved players' level has changed, 
- * should lead to throwing @ChallengeIsNoLongerValidException.
- * TestCase 12. Retrieving list of challenges, which were sent by specific player,
- * should always return some list with ChallengesTO. If there are no such challenges,
- * the list should be empty.
- * TestCase 13. Retrieving list of challenges, which were received by specific player,
- * should always return some list with ChallengesTO. If there are no such challenges,
- * the list should be empty.
- * TestCase 14. Removing outdated challenges should cause deletion only of challenges,
- * which are older than 7 days.
- */
 
 @SpringApplicationConfiguration(ChessApplication.class)
 @RunWith(SpringJUnit4ClassRunner.class)
