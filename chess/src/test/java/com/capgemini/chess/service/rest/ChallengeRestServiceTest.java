@@ -24,10 +24,13 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
+import com.capgemini.chess.dao.ChallengeDao;
+import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
+import com.capgemini.chess.service.mapper.ChallengeMapper;
 import com.capgemini.chess.service.testcollections.ChallengeTOTestList;
 import com.capgemini.chess.service.testcollections.PlayerStatisticsTOTestList;
 import com.capgemini.chess.service.to.ChallengeTO;
@@ -35,7 +38,7 @@ import com.capgemini.chess.service.to.PlayerStatisticsTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = "classpath:**/challenge-rest-service-test-configuration.xml")
+@ContextConfiguration(locations = {"classpath:**/challenge-rest-service-test-configuration.xml", "classpath:**/database-configuration-rest-test.xml"})
 @WebAppConfiguration
 public class ChallengeRestServiceTest {
 	
@@ -43,6 +46,9 @@ public class ChallengeRestServiceTest {
 
 	@Autowired
 	private ChallengeService challengeService;
+	
+	@Autowired
+	private ChallengeDao challengeDao;
 	
 	@Before
 	public void setup() {
@@ -94,7 +100,7 @@ public class ChallengeRestServiceTest {
 		long idOfChallengedPlayer = 376L;
 		
 		// when
-		Mockito.doThrow(new PlayerNotExistException()).when(challengeService)
+		Mockito.doThrow(new PlayerNotExistException(idOfChallengingPlayer)).when(challengeService)
 				.createChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
 		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/" + idOfChallengingPlayer
 				+ "/" + idOfChallengedPlayer));
@@ -174,14 +180,14 @@ public class ChallengeRestServiceTest {
 	}
 	
 	@Test
-	public void shouldReturnNotFoundStatusWhenAcceptChallengeBecausePlayerNotExist() throws Exception {
+	public void testShouldReturnNotFoundStatusWhenAcceptChallengeAndChallengeNotExist() throws Exception {
 		// given 
-		long idChallenge = 354L;
+		long idChallengeNotExisting = 355L;
 		
 		// when
-		Mockito.doThrow(new PlayerNotExistException()).when(challengeService)
-				.acceptChallenge(idChallenge);
-		ResultActions response = this.mockMvc.perform(post("/chess/challenge/accept/" + idChallenge));
+		Mockito.doThrow(new ChallengeIsNoLongerValidException(idChallengeNotExisting)).when(challengeService)
+				.acceptChallenge(idChallengeNotExisting);
+		ResultActions response = this.mockMvc.perform(post("/chess/challenge/accept/" + idChallengeNotExisting));
 
 		// then
 		response.andExpect(status().isNotFound());
@@ -218,7 +224,7 @@ public class ChallengeRestServiceTest {
 	@Test
 	public void testShouldReturn4SentChallenges() throws Exception {
 		// given:
-		long idRequestingPlayer = 56669L;
+		final long idPlayerRequesting = 56669L;
 		ChallengeTO challengeTO1 = ChallengeTOTestList.PROPER_CHALLENGES_WITH_PLAYER_STATISTICS_TEST_LIST.get(0);
 		ChallengeTO challengeTO2 = ChallengeTOTestList.PROPER_CHALLENGES_WITH_PLAYER_STATISTICS_TEST_LIST.get(1);
 		ChallengeTO challengeTO3 = ChallengeTOTestList.PROPER_CHALLENGES_WITH_PLAYER_STATISTICS_TEST_LIST.get(2);
@@ -228,10 +234,23 @@ public class ChallengeRestServiceTest {
 		mockResultList.add(challengeTO2);
 		mockResultList.add(challengeTO3);
 		mockResultList.add(challengeTO4);
+		
+//		final long idChallengeExistingOne = 5L;
+//		final long idChallengeExistingTwo = 6L;
+//		final long idChallengeExistingThree = 7L;
+//		long idPlayerRequesting = 56669L;
+//		ChallengeEntity challengeExistingOne = challengeDao.findOne(idChallengeExistingOne);
+//		ChallengeEntity challengeExistingTwo = challengeDao.findOne(idChallengeExistingTwo);
+//		ChallengeEntity challengeExistingThree = challengeDao.findOne(idChallengeExistingThree);
+//		List<ChallengeEntity> mockResultList = new ArrayList<>();
+//		mockResultList.add(challengeExistingOne);
+//		mockResultList.add(challengeExistingTwo);
+//		mockResultList.add(challengeExistingThree);
+//		List<ChallengeTO> mockResultListMappedToTOs = ChallengeMapper.map2TOs(mockResultList);
 
 		// when
-		Mockito.when(challengeService.getSentChallenges(idRequestingPlayer)).thenReturn(mockResultList);
-		ResultActions response = this.mockMvc.perform(get("/chess/challenge/sentChallenges/" + idRequestingPlayer)
+		Mockito.when(challengeService.getSentChallenges(idPlayerRequesting)).thenReturn(mockResultList);
+		ResultActions response = this.mockMvc.perform(get("/chess/challenge/sentChallenges/" + idPlayerRequesting)
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content("4"));
 
 		response.andExpect(status().isOk())
@@ -245,7 +264,7 @@ public class ChallengeRestServiceTest {
 	public void testShouldReturnNoContentWhenGetSentChallenges() throws Exception {
 		// given:
 		long idRequestingPlayer = 56669L;
-		List<ChallengeTO> mockResultList = new ArrayList<>();
+		List<ChallengeEntity> mockResultList = new ArrayList<>();
 
 		// when
 		Mockito.when(challengeService.getSentChallenges(idRequestingPlayer)).thenReturn(mockResultList);
@@ -257,31 +276,35 @@ public class ChallengeRestServiceTest {
 	@Test
 	public void testShouldReturn3ReceivedChallenges() throws Exception {
 		// given:
-		long idRequestingPlayer = 56669L;
-		ChallengeTO challengeTO1 = ChallengeTOTestList.PROPER_CHALLENGES_WITH_PLAYER_STATISTICS_TEST_LIST.get(0);
-		ChallengeTO challengeTO2 = ChallengeTOTestList.PROPER_CHALLENGES_WITH_PLAYER_STATISTICS_TEST_LIST.get(1);
-		ChallengeTO challengeTO3 = ChallengeTOTestList.PROPER_CHALLENGES_WITH_PLAYER_STATISTICS_TEST_LIST.get(2);
-		List<ChallengeTO> mockResultList = new ArrayList<>();
-		mockResultList.add(challengeTO1);
-		mockResultList.add(challengeTO2);
-		mockResultList.add(challengeTO3);
+		final long idChallengeExistingOne = 5L;
+		final long idChallengeExistingTwo = 6L;
+		final long idChallengeExistingThree = 7L;
+		long idPlayerRequesting = 56669L;
+		ChallengeEntity challengeExistingOne = challengeDao.findOne(idChallengeExistingOne);
+		ChallengeEntity challengeExistingTwo = challengeDao.findOne(idChallengeExistingTwo);
+		ChallengeEntity challengeExistingThree = challengeDao.findOne(idChallengeExistingThree);
+		List<ChallengeEntity> mockResultList = new ArrayList<>();
+		mockResultList.add(challengeExistingOne);
+		mockResultList.add(challengeExistingTwo);
+		mockResultList.add(challengeExistingThree);
+		List<ChallengeTO> mockResultListMappedToTOs = ChallengeMapper.map2TOs(mockResultList);
 
 		// when
-		Mockito.when(challengeService.getReceivedChallenges(idRequestingPlayer)).thenReturn(mockResultList);
-		ResultActions response = this.mockMvc.perform(get("/chess/challenge/receivedChallenges/" + idRequestingPlayer)
+		Mockito.when(challengeService.getReceivedChallenges(idPlayerRequesting)).thenReturn(mockResultList);
+		ResultActions response = this.mockMvc.perform(get("/chess/challenge/receivedChallenges/" + idPlayerRequesting)
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content("3"));
 
 		response.andExpect(status().isOk())
-				.andExpect(jsonPath("[0].idChallenge").value(new Integer((int) challengeTO1.getIdChallenge())))
-				.andExpect(jsonPath("[1].idChallenge").value(new Integer((int) challengeTO2.getIdChallenge())))
-				.andExpect(jsonPath("[2].idChallenge").value(new Integer((int) challengeTO3.getIdChallenge())));
+				.andExpect(jsonPath("[0].idChallenge").value(new Integer((int) mockResultListMappedToTOs.get(0).getIdChallenge())))
+				.andExpect(jsonPath("[1].idChallenge").value(new Integer((int) mockResultListMappedToTOs.get(1).getIdChallenge())))
+				.andExpect(jsonPath("[2].idChallenge").value(new Integer((int) mockResultListMappedToTOs.get(2).getIdChallenge())));
 	}
 	
 	@Test
 	public void testShouldReturnNoContentWhenGetReceivedChallenges() throws Exception {
 		// given:
 		long idRequestingPlayer = 56669L;
-		List<ChallengeTO> mockResultList = new ArrayList<>();
+		List<ChallengeEntity> mockResultList = new ArrayList<>();
 
 		// when
 		Mockito.when(challengeService.getReceivedChallenges(idRequestingPlayer)).thenReturn(mockResultList);

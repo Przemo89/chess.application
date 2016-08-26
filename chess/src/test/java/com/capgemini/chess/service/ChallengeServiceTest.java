@@ -26,8 +26,11 @@ import com.capgemini.chess.dao.ChallengeDao;
 import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
+import com.capgemini.chess.exception.ChallengeCreationException;
 import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
-import com.capgemini.chess.exception.PlayerStatisticsDataIntegrityViolationException;
+import com.capgemini.chess.exception.ChallengeDeclineException;
+import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
+import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 
 
@@ -89,10 +92,6 @@ public class ChallengeServiceTest {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 		
-	/**TestCase 1. Creation of manual challenge - if challenge already exists in
-	 * @ChallengeTOTestList.PROPER_CHALLENGES_TO_TEST_LIST, then it should be only updated 
-	 * with players' current levels and date.
-	 */
 	@Transactional
 	@Test
 	public void testShouldUpdateChallengeWhenCreateManualChallenge() throws Exception {
@@ -135,6 +134,19 @@ public class ChallengeServiceTest {
 		assertEquals(sizeBefore + 1, challengesListAfterChallengeCreation.size());
 		assertEquals(idChallengingPlayer, challengeSaved.getPlayerChallenging().getId());
 		assertEquals(idChallengedPlayer, challengeSaved.getPlayerChallenged().getId());
+	}
+	
+	@Test
+	public void testShouldThrowExceptionWhenCreatingChallengeAndPlayerIsChallengingHimself() throws Exception {
+		//given
+		final long idPlayerChallenging = 5L;
+
+		//then
+		thrown.expect(ChallengeCreationException.class);
+		thrown.expectMessage("Player cannot sent challenge to himself!");
+		
+		//when
+		challengeService.createChallenge(idPlayerChallenging, idPlayerChallenging);
 	}
 	
 	@Test
@@ -239,8 +251,8 @@ public class ChallengeServiceTest {
 		long idChallengeNotExisting = 146L;
 		
 		//when
-		thrown.expect(ChallengeDataIntegrityViolationException.class);
-		thrown.expectMessage(" does not exist anymore!");
+		thrown.expect(ChallengeNotExistException.class);
+		thrown.expectMessage(" does not exist.");
 
 		//then
 		challengeService.acceptChallenge(idChallengeNotExisting);
@@ -258,7 +270,7 @@ public class ChallengeServiceTest {
 		playerStatisticsRepository.update(playerChallenging);
 		
 		//when
-		thrown.expect(ChallengeDataIntegrityViolationException.class);
+		thrown.expect(ChallengeIsNoLongerValidException.class);
 		thrown.expectMessage(" is no longer valid, because players' level changed.");
 
 		//then
@@ -277,7 +289,7 @@ public class ChallengeServiceTest {
 		playerStatisticsRepository.update(playerChallenged);
 		
 		//when
-		thrown.expect(ChallengeDataIntegrityViolationException.class);
+		thrown.expect(ChallengeIsNoLongerValidException.class);
 		thrown.expectMessage(" is no longer valid, because players' level changed.");
 
 		//then
@@ -299,7 +311,7 @@ public class ChallengeServiceTest {
 		playerStatisticsRepository.update(playerChallenged);
 		
 		//when
-		thrown.expect(ChallengeDataIntegrityViolationException.class);
+		thrown.expect(ChallengeIsNoLongerValidException.class);
 		thrown.expectMessage(" is no longer valid, because players' level changed.");
 
 		//then
@@ -376,26 +388,45 @@ public class ChallengeServiceTest {
 	
 	@Transactional
 	@Test
-	public void testShouldDeleteChallengeWhenDeclineChallenge() {
+	public void testShouldDeleteChallengeWhenDeclineChallenge() throws Exception {
 		//given
-		final long idChallengeExisting = 39L;
-		ChallengeEntity challengeToDelete = challengeRepository.findOne(idChallengeExisting);
+		final long idChallengeExistingWhereIdReceiverIs10 = 24L;
 		List<ChallengeEntity> challengesAllBeforeDecline = challengeRepository.findAll();
 		final int challengesNumberBeforeDecline = challengesAllBeforeDecline.size();
 		
 		//when
-		challengeService.declineChallenge(challengeToDelete);
+		challengeService.declineChallenge(idChallengeExistingWhereIdReceiverIs10);
 		List<ChallengeEntity> challengesAllAfterDecline = challengeRepository.findAll();
 		
 		//then
 		Assert.assertEquals(challengesNumberBeforeDecline - 1, challengesAllAfterDecline.size());
-		Assert.assertNull(challengeRepository.findOne(idChallengeExisting));
+		Assert.assertNull(challengeRepository.findOne(idChallengeExistingWhereIdReceiverIs10));
+	}
+	
+	@Test
+	public void testShouldThrowExceptionWhenDeclineChallengeByPlayerWhoDidNotReceiveIt() throws Exception {
+		//given
+		final long idChallengeExistingWhereIdReceiverIsNot10 = 39L;
+		
+		//then
+		thrown.expect(ChallengeDeclineException.class);
+		
+		//when
+		challengeService.declineChallenge(idChallengeExistingWhereIdReceiverIsNot10);
+	}
+	
+	@Test
+	public void testShouldThrowExceptionWhenDeclineChallengeWhichNotExists() throws Exception {
+		//given
+		final long idChallengeNotExisting = 393456L;
+		
+		//then
+		thrown.expect(ChallengeNotExistException.class);
+		
+		//when
+		challengeService.declineChallenge(idChallengeNotExisting);
 	}
 
-	
-	/**TestCase 14. Removing outdated challenges should cause deletion only of challenges,
-	 * which are older than 7 days.
-	 */
 	@Transactional
 	@Test
 	public void testShouldDeleteOutdatedChallenges() throws Exception {

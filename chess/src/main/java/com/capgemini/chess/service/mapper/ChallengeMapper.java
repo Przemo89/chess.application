@@ -1,8 +1,8 @@
 package com.capgemini.chess.service.mapper;
 
-import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
-import com.capgemini.chess.algorithms.data.enums.Level;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.service.to.ChallengeTO;
 
@@ -30,13 +30,17 @@ public class ChallengeMapper {
 		return null;
 	}
 	
-	public static ChallengeEntity map(ChallengeTO challengeTo) {
-		if (challengeTo != null) {
-			ChallengeEntity challengeEntity = new ChallengeEntity();
-			challengeEntity.setId(challengeTo.getIdChallenge());
-//			challengeEntity.set
-		}
-		return null;
+//	public static ChallengeEntity map(ChallengeTO challengeTo) {
+//		if (challengeTo != null) {
+//			ChallengeEntity challengeEntity = new ChallengeEntity();
+//			challengeEntity.setId(challengeTo.getIdChallenge());
+////			challengeEntity.set
+//		}
+//		return null;
+//	}
+	
+	public static List<ChallengeTO> map2TOs(List<ChallengeEntity> challengeEntities) {
+		return challengeEntities.stream().map(ChallengeMapper::map).collect(Collectors.toList());
 	}
 
 }

@@ -2,14 +2,15 @@ package com.capgemini.chess.service;
 
 import java.util.List;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
+import com.capgemini.chess.exception.ChallengeCreationException;
 import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
+import com.capgemini.chess.exception.ChallengeDeclineException;
+import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
+import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
-@Scope(proxyMode = ScopedProxyMode.INTERFACES)
+
 public interface ChallengeService {
 
 	/**Creates manual challenge. If challenge already exists in DB, it will
@@ -20,7 +21,7 @@ public interface ChallengeService {
 	 * @return challenge entity which was saved or updated.
 	 */
 	ChallengeEntity createChallenge(long idChallengingPlayer, long idChallengedPlayer) 
-			throws ChallengeDataIntegrityViolationException;
+			throws ChallengeCreationException;
 	
 	/**Finds matching players during creation of challenge list (automatic)
 	 * @param idPlayerChallenging
@@ -31,7 +32,7 @@ public interface ChallengeService {
 	/**Removes record containing specific challenge from DB through ChallengeDAO.
 	 * @param challenge - challenge, which is to be declined
 	 */
-	void declineChallenge(ChallengeEntity challenge);
+	void declineChallenge(long idChallenge) throws ChallengeDeclineException, ChallengeNotExistException;
 	
 	/**Checks if challenge exist, then compares level of players from:
 	 * 1. Moment when challenge has been created (from ChallengeEntity)
@@ -42,7 +43,7 @@ public interface ChallengeService {
 	 * @throws ChallengeDataIntegrityViolationException - if challenge not exists or 
 	 * change of players' levels detected
 	 */
-	void acceptChallenge(long idChallenge) throws ChallengeDataIntegrityViolationException;
+	void acceptChallenge(long idChallenge) throws ChallengeNotExistException, ChallengeIsNoLongerValidException;
 	
 	/**Retrieves from DB (through ChallengesDAO) all challenges sent by specific player.
 	 * @param idPlayer - identifies the player

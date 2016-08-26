@@ -13,7 +13,7 @@ import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 
 @Repository
 public class ChallengeDaoImpl extends AbstractDao<ChallengeEntity, Long> implements ChallengeDao {
-	
+
 	/**Retrieves from DB players statistics entities of both challenging and challenged players.
 	 * Also - if such challenge entity exists - retrieves challenge entity from DB, which already 
 	 * exists for both players. If challenge exists, it will be only updated, if not - new one 

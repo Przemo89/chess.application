@@ -13,7 +13,9 @@ import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.domain.statistics.PointsCalculator;
+import com.capgemini.chess.exception.ChallengeCreationException;
 import com.capgemini.chess.exception.ChallengeDataIntegrityViolationException;
+import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -43,7 +45,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Override
 	@Transactional(readOnly = false)
 	public ChallengeEntity createChallenge(long idPlayerChallenging, long idPlayerChallenged) 
-			throws ChallengeDataIntegrityViolationException {
+			throws ChallengeCreationException {
 		List<PlayerStatisticsEntity> playersStatistics = challengeDao
 				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged);
 		isPlayerChallengingHimself(idPlayerChallenging, idPlayerChallenged);
@@ -63,9 +65,9 @@ public class ChallengeServiceImpl implements ChallengeService {
 	}
 
 	private void isPlayerChallengingHimself(long idPlayerChallenging, long idPlayerChallenged)
-			throws ChallengeDataIntegrityViolationException {
+			throws ChallengeCreationException {
 		if (idPlayerChallenging == idPlayerChallenged) {
-			throw new ChallengeDataIntegrityViolationException("User cannot sent challenge to himself!");
+			throw new ChallengeCreationException();
 		}
 	}
 
@@ -153,8 +155,35 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * @param idChallenge - challenge's id, which is to be declined
 	 */
 	@Override
-	public void declineChallenge(ChallengeEntity challenge) {
-		challengeDao.delete(challenge);
+	@Transactional(readOnly = false)
+	public void declineChallenge(long idChallenge) 
+			throws ChallengeDeclineException, ChallengeNotExistException {
+		ChallengeEntity challengeToDelete = challengeDao.findOne(idChallenge);
+		isChallengeExists(challengeToDelete, idChallenge);
+		isChallengeDeclinedByPlayerChallenged(challengeToDelete);
+		challengeDao.delete(challengeToDelete);
+	}
+
+	private void isChallengeExists(ChallengeEntity challengeToDelete, long idChallenge)
+			throws ChallengeNotExistException {
+		if (challengeToDelete == null) {
+			throw new ChallengeNotExistException(idChallenge);
+		}
+	}
+
+	private void isChallengeDeclinedByPlayerChallenged(ChallengeEntity challengeToDelete)
+			throws ChallengeDeclineException {
+		if (getIdRequestingPlayer() != challengeToDelete.getPlayerChallenged().getId()) {
+			throw new ChallengeDeclineException();
+		}
+	}
+	
+	/**Will return requesting player's id from SecurityContextHolder when it will be implemented.
+	 * For now will return always 10L.
+	 * @return
+	 */
+	private long getIdRequestingPlayer() {
+		return 10L;
 	}
 
 	/**Checks if challenge exist, then compares level of players from:
@@ -168,27 +197,18 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * @throws PlayerNotExistException - if any of the players does not exist in DB anymore
 	 */
 	@Override
-	public void acceptChallenge(long idChallenge) throws ChallengeDataIntegrityViolationException {
+	public void acceptChallenge(long idChallenge) throws ChallengeNotExistException, ChallengeIsNoLongerValidException {
 		ChallengeEntity challengeToAccept = challengeDao.findOne(idChallenge);
-		isChallengedReturned(idChallenge, challengeToAccept);
+		isChallengeExists(challengeToAccept, idChallenge);
 		isPlayersLevelsChanged(challengeToAccept);
 		gameService.startMatch(challengeToAccept);
 	}
 
 	private void isPlayersLevelsChanged(ChallengeEntity challengeToAccept)
-			throws ChallengeDataIntegrityViolationException {
+			throws ChallengeIsNoLongerValidException {
 		if (challengeToAccept.getPlayerChallenging().getLevel() != challengeToAccept.getLevelPlayerChallenging()
 				|| challengeToAccept.getPlayerChallenged().getLevel() != challengeToAccept.getLevelPlayerChallenged()) {
-			throw new ChallengeDataIntegrityViolationException("Challenge with id: " + challengeToAccept.getId() + 
-					" is no longer valid, because players' level changed.");
-		}
-	}
-
-	private void isChallengedReturned(long idChallenge, ChallengeEntity challengeToAccept)
-			throws ChallengeDataIntegrityViolationException {
-		if (challengeToAccept == null) {
-			throw new ChallengeDataIntegrityViolationException("Specified challenge with id = " + idChallenge
-					+ " does not exist anymore!");
+			throw new ChallengeIsNoLongerValidException(challengeToAccept.getId());
 		}
 	}
 
