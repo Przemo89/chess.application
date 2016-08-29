@@ -43,7 +43,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 */
 	@Override
 	@Transactional(readOnly = false)
-	public ChallengeEntity createChallenge(long idPlayerChallenging, long idPlayerChallenged) 
+	public ChallengeEntity createOrUpdateChallenge(long idPlayerChallenging, long idPlayerChallenged) 
 			throws ChallengeCreationException {
 		List<PlayerStatisticsEntity> playersStatistics = challengeDao
 				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged);

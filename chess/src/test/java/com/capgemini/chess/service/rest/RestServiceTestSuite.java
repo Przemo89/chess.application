@@ -1,11 +1,11 @@
-package com.capgemini.chess.service;
+package com.capgemini.chess.service.rest;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ChallengeServiceTest.class, UserServiceTest.class})
-public class ServiceTestSuite {
+@SuiteClasses({ChallengeRestServiceTest.class})
+public class RestServiceTestSuite {
 
 }

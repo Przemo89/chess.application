@@ -19,7 +19,7 @@ public interface ChallengeService {
 	 * @param idOfChallengedPlayer
 	 * @return challenge entity which was saved or updated.
 	 */
-	ChallengeEntity createChallenge(long idChallengingPlayer, long idChallengedPlayer) 
+	ChallengeEntity createOrUpdateChallenge(long idChallengingPlayer, long idChallengedPlayer) 
 			throws ChallengeCreationException;
 	
 	/**Finds matching players during creation of challenge list (automatic)

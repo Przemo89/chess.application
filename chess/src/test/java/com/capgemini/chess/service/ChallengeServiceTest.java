@@ -53,7 +53,7 @@ public class ChallengeServiceTest {
 		
 	@Transactional
 	@Test
-	public void testShouldUpdateChallengeWhenCreateManualChallenge() throws Exception {
+	public void testShouldUpdateDatesCreatedAndLastModificatedWhenUpdatingChallenge() throws Exception {
 		//given
 		final long idChallengeThatExist = 1L;
 		ChallengeEntity challengeBeforeUpdate = challengeRepository.findOne(idChallengeThatExist);
@@ -64,8 +64,11 @@ public class ChallengeServiceTest {
 		final int sizeBefore = challengesListBeforeChallengeCreation.size();
 		
 		//when
-		TimeUnit.SECONDS.sleep(2);
-		ChallengeEntity challengeAfterUpdate = challengeService.createChallenge(idChallengingPlayer, idChallengedPlayer);
+		TimeUnit.SECONDS.sleep(1);
+		// createOrUpdateChallenge() method updates challenge, if challenge with challenging and challenged players 
+		// already exists in DB. Otherwise, new challenge is created. 
+		ChallengeEntity challengeAfterUpdate = challengeService.createOrUpdateChallenge(idChallengingPlayer, idChallengedPlayer);
+		
 		//then
 		List<ChallengeEntity> challengesListAfterChallengeUpdate = challengeRepository.findAll();
 
@@ -86,7 +89,7 @@ public class ChallengeServiceTest {
 		final int sizeBefore = challengesListBeforeChallengeCreation.size();
 		
 		//when
-		ChallengeEntity challengeSaved = challengeService.createChallenge(idChallengingPlayer, idChallengedPlayer);
+		ChallengeEntity challengeSaved = challengeService.createOrUpdateChallenge(idChallengingPlayer, idChallengedPlayer);
 		
 		//then
 		List<ChallengeEntity> challengesListAfterChallengeCreation = challengeRepository.findAll();
@@ -105,7 +108,7 @@ public class ChallengeServiceTest {
 		thrown.expectMessage("Player cannot sent challenge to himself!");
 		
 		//when
-		challengeService.createChallenge(idPlayerChallenging, idPlayerChallenging);
+		challengeService.createOrUpdateChallenge(idPlayerChallenging, idPlayerChallenging);
 	}
 	
 	@Test
@@ -131,7 +134,7 @@ public class ChallengeServiceTest {
 	}
 	
 	@Test
-	public void shouldReturnListWithPlayersNullifiedPasswordsWhenGettingMatchingPlayers() throws Exception {
+	public void shouldReturnListWithPlayersRankingPositionWhenGettingMatchingPlayers() throws Exception {
 		//given
 		final long idPlayerChallengingExisting = 12L;
 		final long rankingPositionChuckNorris = 1L;
@@ -433,5 +436,42 @@ public class ChallengeServiceTest {
 		Assert.assertEquals(challengeOutdatedCreatedOne.getDateCreated(), dateCreatedOld);
 		Assert.assertEquals(challengeOutdatedCreatedTwo.getDateCreated(), dateCreatedOld);
 		Assert.assertEquals(challengeOutdatedCreatedThree.getDateCreated(), dateCreatedOld);
+	}
+	
+	@Transactional
+	@Test
+	public void testShouldUpdateVersionNumber() throws Exception {
+		//given
+		final long idChallengeExisting = 27L;
+		final Integer versionBeforeUpdate = 1;
+		final Integer versionAfterUpdate = 2;
+		ChallengeEntity challengeBeforeUpdate = challengeRepository.findOne(idChallengeExisting);
+		entityManager.detach(challengeBeforeUpdate);
+		challengeBeforeUpdate.setDateCreated(new Date());
+		
+		//when
+		ChallengeEntity challengeAfterUpdate = challengeRepository.update(challengeBeforeUpdate);
+		entityManager.flush();
+
+		//then
+		assertEquals(versionBeforeUpdate, challengeBeforeUpdate.getVersion());
+		assertEquals(versionAfterUpdate, challengeAfterUpdate.getVersion());
+	}
+	
+	@Transactional
+	@Test
+	public void testShouldSetCreationDateAndLastModificationDateWhenCreatingChallenge() throws Exception {
+		//given
+		final long idPlayerOneNotHavingAnyChallenges = 16L;
+		final long idPlayerOneTwoHavingAnyChallenges = 17L;
+
+		//when
+		TimeUnit.SECONDS.sleep(1);
+		ChallengeEntity challengeCreated = challengeService.createOrUpdateChallenge(idPlayerOneNotHavingAnyChallenges, 
+				idPlayerOneTwoHavingAnyChallenges);
+		
+		//then
+		Assert.assertNotNull(challengeCreated.getDateCreated());
+		Assert.assertNotNull(challengeCreated.getDateLastModified());
 	}
 }

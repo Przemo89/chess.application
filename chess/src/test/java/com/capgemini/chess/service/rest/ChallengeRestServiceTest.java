@@ -38,7 +38,6 @@ import com.capgemini.chess.service.mapper.ChallengeMapper;
 import com.capgemini.chess.service.mapper.PlayerMatchingMapper;
 import com.capgemini.chess.service.to.ChallengeTO;
 import com.capgemini.chess.service.to.PlayerMatchingTO;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:**/challenge-rest-service-test-configuration.xml", "classpath:**/database-configuration-rest-test.xml"})
@@ -70,20 +69,6 @@ public class ChallengeRestServiceTest {
 		// Rest Service, we have to use reflection to mock existing field challenge service
 		ReflectionTestUtils.setField(challengeRestService, "challengeService", challengeService);
 	}
-
-	/**
-	 * (Example)
-	 * Sample method which convert's any object from Java to String
-	 */
-	private static String asJsonString(final Object obj) {
-		try {
-			final ObjectMapper mapper = new ObjectMapper();
-			final String jsonContent = mapper.writeValueAsString(obj);
-			return jsonContent;
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 	
 	@Test
 	public void shouldReturnOkStatusWhenCreatingChallenge() throws Exception {
@@ -107,7 +92,7 @@ public class ChallengeRestServiceTest {
 		
 		// when
 		Mockito.doThrow(new ChallengeCreationException()).when(challengeService)
-				.createChallenge(idPlayerChallengingNotExisting, idPlayerChallengedNotExisting);
+				.createOrUpdateChallenge(idPlayerChallengingNotExisting, idPlayerChallengedNotExisting);
 		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/" + idPlayerChallengingNotExisting
 				+ "/" + idPlayerChallengedNotExisting));
 

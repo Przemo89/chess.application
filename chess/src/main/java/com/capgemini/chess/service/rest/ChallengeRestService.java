@@ -35,7 +35,7 @@ public class ChallengeRestService {
 	@ResponseStatus(value = HttpStatus.OK)
 	public void createManualChallenge(@PathVariable(value = "idChallenger") final long idOfChallengingPlayer, 
 			@PathVariable(value = "idChallenged") final long idOfChallengedPlayer) throws ChallengeCreationException {
-		challengeService.createChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
+		challengeService.createOrUpdateChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
 	}
 
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Player does not exist.")

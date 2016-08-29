@@ -39,7 +39,6 @@ public class PlayersStatisticsUpdate {
 	 * It's called in constructor after method which checks provided data
 	 * corectness ( @checkInputDataCorectness). It always initialize winning and
 	 * losing player, even if it's a draw.
-	 * 
 	 * @param whitePiecesPlayer
 	 * @param gameResultForWhitePiecesPlayer
 	 * @param blackPiecesPlayer
