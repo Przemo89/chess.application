@@ -32,11 +32,11 @@ public class ChallengeEntity extends VersionControl implements Serializable {
 	private long id;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_player_challenging", nullable = false)
+	@JoinColumn(name = "id_player_statistics_challenging", nullable = false)
 	private PlayerStatisticsEntity playerChallenging;
 	
 	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "id_player_challenged", nullable = false)
+	@JoinColumn(name = "id_player_statistics_challenged", nullable = false)
 	private PlayerStatisticsEntity playerChallenged;
 	
 	@Column(name = "level_player_challenging", nullable = false)

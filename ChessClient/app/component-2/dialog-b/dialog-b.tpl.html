@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div class="row">
+  <div class="col-xs-4">
+    Filter By
+<select class="form-control" ng-model="data.selectedGenre" ng-options="genre for genre in data.genres" ng-change="isSelectedGenre()">
+   <option value="">Please select</option>
+   </select>
+  </div>
+</div>
+
+<div ng-show="isSelected === true">
+<table class="table table-hover">
+  <thead>
+    <th>Title</th>
+    <th>Author</th>
+  </thead>
+  <tbody>
+    <tr ng-repeat="item in data.books" ng-click="setSelectedRow($index)" ng-class="{'active': selectedRow == $index}">
+      <td>{{item.title}}</td>
+      <td>{{item.author}}</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+</body>
+</html>

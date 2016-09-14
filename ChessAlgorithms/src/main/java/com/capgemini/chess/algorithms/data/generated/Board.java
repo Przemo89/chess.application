@@ -1,7 +1,6 @@
 package com.capgemini.chess.algorithms.data.generated;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import com.capgemini.chess.algorithms.data.Coordinate;

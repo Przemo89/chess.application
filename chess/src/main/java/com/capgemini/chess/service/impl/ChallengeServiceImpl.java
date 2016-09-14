@@ -12,7 +12,6 @@ import com.capgemini.chess.dao.ChallengeDao;
 import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
-import com.capgemini.chess.domain.statistics.PointsCalculator;
 import com.capgemini.chess.exception.ChallengeCreationException;
 import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
@@ -20,6 +19,7 @@ import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
 import com.capgemini.chess.service.GameService;
+import com.capgemini.chess.service.PlayerStatisticsService;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,6 +33,9 @@ public class ChallengeServiceImpl implements ChallengeService {
 	
 	@Autowired
 	private GameService gameService;
+	
+	@Autowired
+	private PlayerStatisticsService playersStatisticsUpdate;
 
 	/**Creates manual challenge. If challenge already exists in DB, it will
 	 * be updated with current Date. Check, if both players exist, will be performed
@@ -45,7 +48,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Transactional(readOnly = false)
 	public ChallengeEntity createOrUpdateChallenge(long idPlayerChallenging, long idPlayerChallenged) 
 			throws ChallengeCreationException {
-		List<PlayerStatisticsEntity> playersStatistics = challengeDao
+		List<PlayerStatisticsEntity> playersStatistics = playerStatisticsDao
 				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged);
 		isPlayerChallengingHimself(idPlayerChallenging, idPlayerChallenged);
 		int playerChallengingIndexInList = setPlayerChallengingIndexInList(playersStatistics.get(0), idPlayerChallenging);
@@ -144,9 +147,10 @@ public class ChallengeServiceImpl implements ChallengeService {
 	private void setPotentialBenefitLossAndGetProfile(List<PlayerStatisticsEntity> potentialRivalPlayers,
 			PlayerStatisticsEntity playerChallenging) {
 		for (PlayerStatisticsEntity player : potentialRivalPlayers) {
-			PointsCalculator pointCalculator = new PointsCalculator(playerChallenging, player);
-			player.setPotentialBenefitForChallengingPlayer(pointCalculator.calculateWinnerProfit());
-			player.setPotentialLossForChallengingPlayer(pointCalculator.calculateChallengingPlayerPotentialLoss());
+//			PointsCalculator pointCalculator = new PointsCalculator(playerChallenging, player);
+			player.setPotentialBenefitForChallengingPlayer(playersStatisticsUpdate.calculateWinnerProfit(playerChallenging, player));
+			player.setPotentialLossForChallengingPlayer(playersStatisticsUpdate
+					.calculateChallengingPlayerPotentialLoss(playerChallenging, player));
 		}
 	}
 

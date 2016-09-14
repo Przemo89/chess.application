@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+  <section>
+    <h2>Hello from Dialog A!</h2>
+
+    <div ng-show="data.isSentChallengesAvailable === true">
+    <table class="table table-hover">
+      <thead>
+        <th>Challenge Id</th>
+        <th>Challenged Player Points</th>
+      </thead>
+      <tbody>
+        <tr ng-repeat="item in data.sentChallenges" ng-click="setSelectedRow($index)" ng-class="{'active': selectedRow == $index}">
+          <td>{{item.idChallenge}}</td>
+          <td>{{item.pointsPlayerChallenged}}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+    <button name="addBookButton" ng-click="getSentChallenges()" class="btn btn-default">Add book</button>
+
+    <button name="editBookButton" ng-hide="selectedRow === null" ng-click="edit()" class="btn btn-default">Edit book</button>
+
+  </section>
+</body>
+</html>

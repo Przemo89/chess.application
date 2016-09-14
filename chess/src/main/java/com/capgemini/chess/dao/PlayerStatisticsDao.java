@@ -17,4 +17,16 @@ public interface PlayerStatisticsDao extends Dao<PlayerStatisticsEntity, Long> {
 	List<PlayerStatisticsEntity> getMatchingPlayersList(long idPlayerChallenging, List<String> levelsString);
 	
 	Long getPlayerRankingPosition(int playerPoints);
+	
+	/**Retrieves from DB players statistics entities of both challenging and challenged players.
+	 * Also - if such challenge entity exists - retrieves challenge entity from DB, which already 
+	 * exists for both players. If challenge exists, it will be only updated, if not - new one 
+	 * will be created.
+	 * @param idPlayerChallenging
+	 * @param idPlayerChallenged
+	 * @return list which should contain two filled entities. Service will verify it and in case when 
+	 * some of the returned entities would turn out to be null, proper Exception will be thrown.
+	 */
+	public List<PlayerStatisticsEntity> findBothPlayerStatisticsForChallengeCreation(long idPlayerChallenging,
+			long idPlayerChallenged);
 }

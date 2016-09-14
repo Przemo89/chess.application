@@ -38,6 +38,12 @@ public class PlayerStatisticsEntity extends VersionControl implements Serializab
 	@OneToMany(mappedBy = "playerChallenged", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<ChallengeEntity> challengesReceived;
 	
+	@OneToMany(mappedBy = "playerStatisticsWhitePieces", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<GameEntity> currentGamesWithWhitePieces;
+	
+	@OneToMany(mappedBy = "playerStatisticsBlackPieces", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<GameEntity> currentGamesWithBlackPieces;
+	
 	@OneToOne(mappedBy = "playerStatistics", fetch = FetchType.LAZY)
 	private PlayerProfileEntity playerProfile;
 	
@@ -95,6 +101,22 @@ public class PlayerStatisticsEntity extends VersionControl implements Serializab
 
 	public void setChallengesReceived(List<ChallengeEntity> challengesReceived) {
 		this.challengesReceived = challengesReceived;
+	}
+	
+	public List<GameEntity> getCurrentGamesWithWhitePieces() {
+		return currentGamesWithWhitePieces;
+	}
+
+	public void setCurrentGamesWithWhitePieces(List<GameEntity> currentGamesWithWhitePieces) {
+		this.currentGamesWithWhitePieces = currentGamesWithWhitePieces;
+	}
+
+	public List<GameEntity> getCurrentGamesWithBlackPieces() {
+		return currentGamesWithBlackPieces;
+	}
+
+	public void setCurrentGamesWithBlackPieces(List<GameEntity> currentGamesWithBlackPieces) {
+		this.currentGamesWithBlackPieces = currentGamesWithBlackPieces;
 	}
 
 	public int getPoints() {

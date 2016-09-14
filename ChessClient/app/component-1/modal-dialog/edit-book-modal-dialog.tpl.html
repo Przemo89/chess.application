@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div class="modal-content">
+    <div class="modal-header">
+        <h3 class="modal-title">Edit book</h3>
+    </div>
+    <div class="modal-body">
+      <form name="editBook.form">
+        <td>Title: {{data.selectedBook.title}}
+          <div class="form-group" ng-class="{'has-error bg-danger': editBook.form.title.$invalid}">
+            <input name="title"  class="form-control" ng-required="true" type="text" ng-model="data.selectedBook.title"/>
+          </div
+        </td>
+        <td>Author: {{data.selectedBook.author}}
+          <div class="form-group" ng-class="{'has-error bg-danger': editBook.form.author.$invalid}">
+            <input name="author"  class="form-control" ng-required="true" type="text" ng-model="data.selectedBook.author" />
+          </div
+        </td>
+        <td>Year: {{getSelectedDataYear()}}
+            <datepicker ng-model="dt" min-mode="year" max-date="maxDate" datepicker-mode="'year'" />
+        </td>
+        <td>Genre: {{data.selectedBook.genre}}
+          <div class="form-group" ng-class="{'has-error bg-danger': editBook.form.genre.$invalid}">
+            <input name="genre"  class="form-control" ng-required="true" type="text" ng-model="data.selectedBook.genre" />
+          </div
+        </td>
+      </form>
+    </div>
+
+    <div class="modal-footer ">
+        <button name="editBookButtonInModal" class="btn btn-primary" ng-disabled="editBook.form.$invalid" ng-click="update()">Update</button>
+        <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+    </div>
+</div>
+</body>
+</html>
