@@ -35,7 +35,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 	private GameService gameService;
 	
 	@Autowired
-	private PlayerStatisticsService playersStatisticsUpdate;
+	private PlayerStatisticsService playersStatisticsService;
 
 	/**Creates manual challenge. If challenge already exists in DB, it will
 	 * be updated with current Date. Check, if both players exist, will be performed
@@ -123,7 +123,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 
 	private List<PlayerStatisticsEntity> createMatchingPlayersFinalList(PlayerStatisticsEntity playerChallenging,
 			List<PlayerStatisticsEntity> potentialRivalPlayers) {
-		setPotentialBenefitLossAndGetProfile(potentialRivalPlayers, playerChallenging);
+		setPotentialBenefitLoss(potentialRivalPlayers, playerChallenging);
 		return potentialRivalPlayers;
 	}
 
@@ -144,12 +144,11 @@ public class ChallengeServiceImpl implements ChallengeService {
 		}
 	}
 
-	private void setPotentialBenefitLossAndGetProfile(List<PlayerStatisticsEntity> potentialRivalPlayers,
+	private void setPotentialBenefitLoss(List<PlayerStatisticsEntity> potentialRivalPlayers,
 			PlayerStatisticsEntity playerChallenging) {
 		for (PlayerStatisticsEntity player : potentialRivalPlayers) {
-//			PointsCalculator pointCalculator = new PointsCalculator(playerChallenging, player);
-			player.setPotentialBenefitForChallengingPlayer(playersStatisticsUpdate.calculateWinnerProfit(playerChallenging, player));
-			player.setPotentialLossForChallengingPlayer(playersStatisticsUpdate
+			player.setPotentialBenefitForOtherPlayer(playersStatisticsService.calculateWinnerProfit(playerChallenging, player));
+			player.setPotentialLossForOtherPlayer(playersStatisticsService
 					.calculateChallengingPlayerPotentialLoss(playerChallenging, player));
 		}
 	}
@@ -163,7 +162,7 @@ public class ChallengeServiceImpl implements ChallengeService {
 			throws ChallengeDeclineException, ChallengeNotExistException {
 		ChallengeEntity challengeToDelete = challengeDao.findOne(idChallenge);
 		isChallengeExists(challengeToDelete, idChallenge);
-		isChallengeDeclinedByPlayerChallenged(challengeToDelete);
+//		isChallengeDeclinedByPlayerChallenged(challengeToDelete);
 		challengeDao.delete(challengeToDelete);
 	}
 
@@ -200,10 +199,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 	 * @throws PlayerNotExistException - if any of the players does not exist in DB anymore
 	 */
 	@Override
+	@Transactional(readOnly = false)
 	public void acceptChallenge(long idChallenge) throws ChallengeNotExistException, ChallengeIsNoLongerValidException {
 		ChallengeEntity challengeToAccept = challengeDao.findOne(idChallenge);
 		isChallengeExists(challengeToAccept, idChallenge);
 		isPlayersLevelsChanged(challengeToAccept);
+		challengeDao.delete(challengeToAccept);
 		gameService.startMatch(challengeToAccept);
 	}
 
@@ -223,6 +224,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Override
 	public List<ChallengeEntity> getSentChallenges(long idPlayer) {
 		List<ChallengeEntity> sentChallenges = challengeDao.getPlayersSentChallenges(idPlayer);
+		PlayerStatisticsEntity playerChallenging = playerStatisticsDao.getOne(idPlayer);
+		List<PlayerStatisticsEntity> playersChallenged = new ArrayList<>();
+		for (ChallengeEntity challenge: sentChallenges) {
+			playersChallenged.add(challenge.getPlayerChallenged());
+		}
+		setPotentialBenefitLoss(playersChallenged, playerChallenging);
 		return sentChallenges;
 	}
 
@@ -234,6 +241,12 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Override
 	public List<ChallengeEntity> getReceivedChallenges(long idPlayer) {
 		List<ChallengeEntity> receivedChallenges = challengeDao.getPlayersReceivedChallenges(idPlayer);
+		PlayerStatisticsEntity playerChallenged = playerStatisticsDao.getOne(idPlayer);
+		List<PlayerStatisticsEntity> playersChallenging = new ArrayList<>();
+		for (ChallengeEntity challenge: receivedChallenges) {
+			playersChallenging.add(challenge.getPlayerChallenging());
+		}
+		setPotentialBenefitLoss(playersChallenging, playerChallenged);
 		return receivedChallenges;
 	}
 	

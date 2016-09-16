@@ -18,8 +18,8 @@ public class PlayerMatchingMapper {
 			playerMatchingTo.setGamesWon(playerStats.getGamesWon());
 			playerMatchingTo.setGamesDrawn(playerStats.getGamesDrawn());
 			playerMatchingTo.setGamesLost(playerStats.getGamesLost());
-			playerMatchingTo.setPotentialBenefitForChallengingPlayer(playerStats.getPotentialBenefitForChallengingPlayer());
-			playerMatchingTo.setPotentialLossForChallengingPlayer(playerStats.getPotentialLossForChallengingPlayer());
+			playerMatchingTo.setPotentialBenefitForChallengingPlayer(playerStats.getPotentialBenefitForOtherPlayer());
+			playerMatchingTo.setPotentialLossForChallengingPlayer(playerStats.getPotentialLossForOtherPlayer());
 			playerMatchingTo.setRankingPosition(playerStats.getRankingPosition());
 			playerMatchingTo.setLogin(playerStats.getPlayerProfile().getLogin());
 			playerMatchingTo.setFirstName(playerStats.getPlayerProfile().getFirstName());

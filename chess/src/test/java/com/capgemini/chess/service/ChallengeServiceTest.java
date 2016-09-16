@@ -187,8 +187,8 @@ public class ChallengeServiceTest {
 		
 		//then
 		for (PlayerStatisticsEntity player : resultList) {
-			Assert.assertTrue(player.getPotentialBenefitForChallengingPlayer() > 0);
-			Assert.assertTrue(player.getPotentialLossForChallengingPlayer() > 0);
+			Assert.assertTrue(player.getPotentialBenefitForOtherPlayer() > 0);
+			Assert.assertTrue(player.getPotentialLossForOtherPlayer() > 0);
 		}
 		Assert.assertEquals(properSize, resultList.size());
 	}

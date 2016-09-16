@@ -1,10 +1,8 @@
 package com.capgemini.chess.service.to;
 
-import java.util.Date;
-
 import com.capgemini.chess.algorithms.data.enums.Level;
 
-public class ChallengeTO {
+public class ChallengeSentTO {
 
 	private long idChallenge;
 	private Level levelPlayerChallenged;
@@ -13,13 +11,13 @@ public class ChallengeTO {
 	private int gamesWonPlayerChallenged;
 	private int gamesDrawnPlayerChallenged;
 	private int gamesLostPlayerChallenged;
-	private Date dateCreationChallenge;
+	private String stringDateCreationChallenge;
 	private int potentialBenefitForChallengingPlayer;
 	private int potentialLossForChallengingPlayer;
 	private String loginPlayerChallenged;
 	private String namePlayerChallenged;
 	
-	public ChallengeTO() {
+	public ChallengeSentTO() {
 		
 	}
 
@@ -37,14 +35,6 @@ public class ChallengeTO {
 
 	public void setLevelPlayerChallenged(Level levelPlayerChallenged) {
 		this.levelPlayerChallenged = levelPlayerChallenged;
-	}
-
-	public Date getDateCreationChallenge() {
-		return dateCreationChallenge;
-	}
-
-	public void setDateCreationChallenge(Date dateCreationChallenge) {
-		this.dateCreationChallenge = dateCreationChallenge;
 	}
 
 	public int getPotentialBenefitForChallengingPlayer() {
@@ -117,5 +107,13 @@ public class ChallengeTO {
 
 	public void setGamesLostPlayerChallenged(int gamesLostPlayerChallenged) {
 		this.gamesLostPlayerChallenged = gamesLostPlayerChallenged;
+	}
+	
+	public String getStringDateCreationChallenge() {
+		return stringDateCreationChallenge;
+	}
+
+	public void setStringDateCreationChallenge(String stringDateCreationChallenge) {
+		this.stringDateCreationChallenge = stringDateCreationChallenge;
 	}
 }

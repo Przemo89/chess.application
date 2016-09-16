@@ -19,20 +19,39 @@ insert into player_statistics (id, player_level, points_total, games_played, gam
 insert into player_statistics (id, player_level, points_total, games_played, games_won, games_drawn, games_lost) values (17,'NEWBIE',0,0,0,0,0);
 --end of section
 
-insert into player_profile (id, email, login, password, id_player_statistics) values (1,'john_walker@chess.com','j_walker','none',1);
-insert into player_profile (id, email, login, password, id_player_statistics) values (2,'johny_walkerz@chess.com','j_walkerz','none',2);
-insert into player_profile (id, email, login, password, id_player_statistics) values (3,'genowefa_prozna@chess.com','g_prozna','none',3);
-insert into player_profile (id, email, login, password, id_player_statistics) values (4,'johnny_walkersss@chess.com','j_walkersss','none',4);
-insert into player_profile (id, email, login, password, id_player_statistics) values (5,'johny_bravo@chess.com','j_bravo','none',5);
-insert into player_profile (id, email, login, password, id_player_statistics) values (6,'jessica_bravo@chess.com','je_bravo','none',6);
-insert into player_profile (id, email, login, password, id_player_statistics) values (7,'barbara_nolife@chess.com','b_nolife','none',7);
-insert into player_profile (id, email, login, password, id_player_statistics) values (8,'samantha_painless@chess.com','s_painless','none',8);
-insert into player_profile (id, email, login, password, id_player_statistics) values (9,'stanislaw_boczny@chess.com','s_boczny','none',9);
-insert into player_profile (id, email, login, password, id_player_statistics) values (10,'bronek_poznanski@chess.com','b_poznanski','none',10);
-insert into player_profile (id, email, login, password, id_player_statistics) values (11,'sylwia_apoznanska@chess.com','s_apoznanska','none',11);
-insert into player_profile (id, email, login, password, id_player_statistics) values (12,'abraham_abrahamski@chess.com','a_abrahamski','none',12);
-insert into player_profile (id, email, login, password, id_player_statistics) values (13,'harry_bob@chess.com','h_bob','none',13);
-insert into player_profile (id, email, login, password, id_player_statistics) values (14,'dante_alighieri@chess.com','d_alighieri','none',14);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (1,'john_walker@chess.com','j_walker','none',1);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (2,'johny_walkerz@chess.com','j_walkerz','none',2);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (3,'genowefa_prozna@chess.com','g_prozna','none',3);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (4,'johnny_walkersss@chess.com','j_walkersss','none',4);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (5,'johny_bravo@chess.com','j_bravo','none',5);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (6,'jessica_bravo@chess.com','je_bravo','none',6);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (7,'barbara_nolife@chess.com','b_nolife','none',7);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (8,'samantha_painless@chess.com','s_painless','none',8);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (9,'stanislaw_boczny@chess.com','s_boczny','none',9);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (10,'bronek_poznanski@chess.com','b_poznanski','none',10);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (11,'sylwia_apoznanska@chess.com','s_apoznanska','none',11);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (12,'abraham_abrahamski@chess.com','a_abrahamski','none',12);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (13,'harry_bob@chess.com','h_bob','none',13);
+--insert into player_profile (id, email, login, password, id_player_statistics) values (14,'dante_alighieri@chess.com','d_alighieri','none',14);
+
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (1,'john_walker@chess.com','j_walker','none','John','Walker',1);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (2,'johny_walkerz@chess.com','j_walkerz','none','Johny','Walkerz',2);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (3,'genowefa_prozna@chess.com','g_prozna','none','Genowefa','Prozna',3);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (4,'johnny_walkersss@chess.com','j_walkersss','none','Johnny','Walkersss',4);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (5,'johny_bravo@chess.com','j_bravo','none','Johny','Bravo',5);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (6,'jessica_bravo@chess.com','jes_bravo','none','Jessica','Bravo',6);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (7,'barbara_nolife@chess.com','b_nolife','none','Barbara','Nolife',7);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (8,'samantha_painless@chess.com','s_painless','none','Samantha','Painless',8);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (9,'stanislaw_boczny@chess.com','s_boczny','none','Stanislaw','Boczny',9);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (10,'bronek_poznanski@chess.com','b_poznanski','none','Bronek','Poznanski',10);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (11,'sylwia_apoznanska@chess.com','s_apoznanska','none','Sylwia','Apoznanska',11);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (12,'abraham_abrahamski@chess.com','a_abrahamski','none','Abraham','Abrahamski',12);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (13,'harry_bob@chess.com','h_bob','none','Harry','Bob',13);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (14,'dante_alighieri@chess.com','d_alighieri','none','Dante','Alighieri',14);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (15,'danuta_piasek@chess.com','d_piasek','none','Danuta','Piasek',15);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (16,'frank_pfang@chess.com','f_pfang','none','Frank','Pfang',16);
+insert into player_profile (id, email, login, password, first_name, last_name, id_player_statistics) values (17,'mark_ofang@chess.com','m_ofang','none','Mark','oFang',17);
+
 
 --Those players will be on 0 level with no challenges at all!
 insert into player_profile (id, email, login, password, id_player_statistics) values (15,'danuta_piasek@chess.com','d_piasek','none',15);

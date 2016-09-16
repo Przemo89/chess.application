@@ -1,27 +1,184 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
+<head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        /* Remove the navbar's default margin-bottom and rounded borders */
+
+        .navbar {
+            margin-bottom: 0;
+            border-radius: 0;
+        }
+        /* Set height of the grid so .sidenav can be 100% (adjust as needed) */
+
+        .row.content {
+            height: 450px
+        }
+        /* Set gray background color and 100% height */
+
+        .sidenav {
+            padding-top: 20px;
+            background-color: #f1f1f1;
+            height: 100%;
+        }
+        /* Set black background color, white text and some padding */
+
+        footer {
+            background-color: #555;
+            color: white;
+            padding: 15px;
+        }
+        /* On small screens, set height to 'auto' for sidenav and grid */
+
+        @media screen and (max-width: 767px) {
+            .sidenav {
+                height: auto;
+                padding: 15px;
+            }
+            .row.content {
+                height: auto;
+            }
+        }
+    </style>
+</head>
 <body>
-  <section>
-    <h2>Hello from Dialog A!</h2>
+    <div class="container-fluid text-center">
+        <div class="row content">
+            <div class="col-sm-2 sidenav">
+                <p>Welcome {{data.playerProfileAndStatistics.login}}!</p>
+                <div id="menu">
+                    <div class="panel list-group">
+                        <a href="javascript:void(0)" class="list-group-item" data-toggle="collapse" data-target="#basicProfile" data-parent="#menu">Profile<span class="glyphicon glyphicon-queen pull-right"></span></a>
+                        <div id="basicProfile" class="sublinks collapse">
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-pawn pull-right"></span>{{data.playerProfileAndStatistics.firstName}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-pawn pull-right"></span>{{data.playerProfileAndStatistics.lastName}}</a>
+                        </div>
+                        <a href="javascript:void(0)" class="list-group-item" data-toggle="collapse" data-target="#statistics" data-parent="#menu">Your Statistics<span class="glyphicon glyphicon-king pull-right"></span></a>
+                        <div id="statistics" class="sublinks collapse">
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Ranking position {{data.playerProfileAndStatistics.rankingPosition}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Level {{data.playerProfileAndStatistics.level}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Total Points {{data.playerProfileAndStatistics.points}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Games Played {{data.playerProfileAndStatistics.gamesPlayed}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Games Won {{data.playerProfileAndStatistics.gamesWon}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Games Drawn {{data.playerProfileAndStatistics.gamesDrawn}}</a>
+                            <a href="javascript:void(0)" class="list-group-item small"><span class="glyphicon glyphicon-knight pull-right"></span>Games Lost {{data.playerProfileAndStatistics.gamesLost}}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+              <p/>
+              <div class="col-sm-10">
+                <form name="setId.form" class="form-horizontal">
+                    <div class="form-group form-group-lg" ng-class="{'has-error bg-danger': setId.form.$invalid && setId.form.$dirty}">
+                        <label class="col-sm-4 control-label">Please provide player's profile id</label>
+                        <div class="col-sm-3">
+                        <input id="lg" name="title" class="form-control" ng-required="true" type="number" min="1" max="17" ng-model="data.idProfileCurrentPlayer" />
+                      </div>
+                        <p/>
+                        <button class="col-sm-1 btn-primary" for="lg" ng-disabled="setId.form.$invalid" ng-click="setPlayerProfileId()">Submit</button>
+                    </div </form>
+                  </div>
+            <div class="col-sm-10 text-left">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="javascript:void(0)" data-target="#sentChallengesTab">Sent challenges</a></li>
+                    <li><a data-toggle="tab" href="javascript:void(0)" data-target="#receivedChallengesTab">Received challenges</a></li>
+                    <li><a data-toggle="tab" href="javascript:void(0)">Menu 2</a></li>
+                </ul>
 
-    <div ng-show="data.isSentChallengesAvailable === true">
-    <table class="table table-hover">
-      <thead>
-        <th>Challenge Id</th>
-        <th>Challenged Player Points</th>
-      </thead>
-      <tbody>
-        <tr ng-repeat="item in data.sentChallenges" ng-click="setSelectedRow($index)" ng-class="{'active': selectedRow == $index}">
-          <td>{{item.idChallenge}}</td>
-          <td>{{item.pointsPlayerChallenged}}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-    <button name="addBookButton" ng-click="getSentChallenges()" class="btn btn-default">Add book</button>
+                <div class="tab-content">
+                    <div id="sentChallengesTab" class="tab-pane fade in active">
+                        <h3>Sent challenges</h3>
+                        <div ng-show="data.isServerUnavailable === true">
+                            <div class="alert alert-danger">
+                                <strong>Error!</strong> Server temporairly unavailable. Please try later
+                            </div>
+                            <button class="btn btn-primary center-block" ng-click="getSentChallenges()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+                        </div>
+                        <div ng-show="data.isSentChallengesAvailable === true">
+                            <table class="table table-striped">
+                                <thead>
+                                    <th>Opponent</th>
+                                    <th>Name</th>
+                                    <th>Level</th>
+                                    <th>Points</th>
+                                    <th>Games Played/Won/Drawn/Lost</th>
+                                    <th>Benefit</th>
+                                    <th>Loss</th>
+                                    <th>Creation Date</th>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="challenge in data.sentChallenges">
+                                        <td>{{challenge.loginPlayerChallenged}}</td>
+                                        <td>{{challenge.namePlayerChallenged}}</td>
+                                        <td>{{challenge.levelPlayerChallenged}}</td>
+                                        <td>{{challenge.pointsPlayerChallenged}}</td>
+                                        <td>{{challenge.gamesPlayedPlayerChallenged}}/{{challenge.gamesWonPlayerChallenged}}/{{challenge.gamesDrawnPlayerChallenged}}/{{challenge.gamesLostPlayerChallenged}}</td>
+                                        <td>{{challenge.potentialBenefitForChallengingPlayer}}</td>
+                                        <td>{{challenge.potentialLossForChallengingPlayer}}</td>
+                                        <td>{{challenge.stringDateCreationChallenge}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="receivedChallengesTab" class="tab-pane fade">
+                        <h3>Received challenges</h3>
+                        <div ng-show="data.isServerUnavailable === true">
+                            <div class="alert alert-danger">
+                                <strong>Error!</strong> Server temporairly unavailable. Please try later
+                            </div>
+                            <button class="btn btn-primary center-block" ng-click="getReceivedChallenges()"><span class="glyphicon glyphicon-refresh"></span> Refresh</button>
+                        </div>
+                        <div ng-show="data.isReceivedChallengesAvailable === true">
+                            <table class="table table-striped">
+                                <thead>
+                                    <th>IdChallenge</th>
+                                    <th>Opponent</th>
+                                    <th>Name</th>
+                                    <th>Level</th>
+                                    <th>Points</th>
+                                    <th>Games Played/Won/Drawn/Lost</th>
+                                    <th>Benefit</th>
+                                    <th>Loss</th>
+                                    <th>Creation Date</th>
+                                    <!-- <th>Action</th> -->
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="challenge in data.receivedChallenges">
+                                        <td>{{challenge.idChallenge}}</td>
+                                        <td>{{challenge.loginPlayerChallenging}}</td>
+                                        <td>{{challenge.namePlayerChallenging}}</td>
+                                        <td>{{challenge.levelPlayerChallenging}}</td>
+                                        <td>{{challenge.pointsPlayerChallenging}}</td>
+                                        <td>{{challenge.gamesPlayedPlayerChallenging}}/{{challenge.gamesWonPlayerChallenging}}
+                                          /{{challenge.gamesDrawnPlayerChallenging}}/{{challenge.gamesLostPlayerChallenging}}</td>
+                                        <td>{{challenge.potentialBenefitForChallengedPlayer}}</td>
+                                        <td>{{challenge.potentialLossForChallengedPlayer}}</td>
+                                        <td>{{challenge.stringDateCreationChallenge}}</td>
+                                        <td><button type="button" class="btn btn-success" ng-click="acceptChallenge($index)">Accept</button></td>
+                                        <td><button type="button" class="btn btn-danger" ng-click="declineChallenge($index)">Decline</button></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="menu2" class="tab-pane fade">
+                        <h3>Menu 2</h3>
+                        <p>Some content in menu 2.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <button name="editBookButton" ng-hide="selectedRow === null" ng-click="edit()" class="btn btn-default">Edit book</button>
-
-  </section>
+    <footer class="container-fluid text-center">
+        <p>Footer Text</p>
+    </footer>
 </body>
 </html>

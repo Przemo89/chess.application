@@ -3,7 +3,7 @@ angular.module('app.component2', ['ngRoute', 'app.component2.templates', 'app.co
         'use strict';
         $routeProvider.when('/component-2/dialog-b', {
             templateUrl: 'component-2/dialog-b/dialog-b.html',
-            controller: 'FilterBookController'
+            controller: 'CreateChallengeController'
         });
     });
 

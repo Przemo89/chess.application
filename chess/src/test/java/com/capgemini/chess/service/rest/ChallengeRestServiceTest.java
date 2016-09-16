@@ -34,9 +34,9 @@ import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
-import com.capgemini.chess.service.mapper.ChallengeMapper;
+import com.capgemini.chess.service.mapper.ChallengeSentMapper;
 import com.capgemini.chess.service.mapper.PlayerMatchingMapper;
-import com.capgemini.chess.service.to.ChallengeTO;
+import com.capgemini.chess.service.to.ChallengeSentTO;
 import com.capgemini.chess.service.to.PlayerMatchingTO;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -264,7 +264,7 @@ public class ChallengeRestServiceTest {
 		mockResultList.add(challengeExistingTwo);
 		mockResultList.add(challengeExistingThree);
 		mockResultList.add(challengeExistingFour);
-		List<ChallengeTO> mockResultListMappedToTOs = ChallengeMapper.map2TOs(mockResultList);
+		List<ChallengeSentTO> mockResultListMappedToTOs = ChallengeSentMapper.map2TOs(mockResultList);
 
 		// when
 		Mockito.when(challengeService.getSentChallenges(idPlayerRequesting)).thenReturn(mockResultList);
@@ -305,7 +305,7 @@ public class ChallengeRestServiceTest {
 		mockResultList.add(challengeExistingOne);
 		mockResultList.add(challengeExistingTwo);
 		mockResultList.add(challengeExistingThree);
-		List<ChallengeTO> mockResultListMappedToTOs = ChallengeMapper.map2TOs(mockResultList);
+		List<ChallengeSentTO> mockResultListMappedToTOs = ChallengeSentMapper.map2TOs(mockResultList);
 
 		// when
 		Mockito.when(challengeService.getReceivedChallenges(idPlayerRequesting)).thenReturn(mockResultList);

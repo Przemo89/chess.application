@@ -1,16 +1,17 @@
 package com.capgemini.chess.service.mapper;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
-import com.capgemini.chess.service.to.ChallengeTO;
+import com.capgemini.chess.service.to.ChallengeSentTO;
 
-public class ChallengeMapper {
+public class ChallengeSentMapper {
 	
-	public static ChallengeTO map(ChallengeEntity challengeEntity) {
+	public static ChallengeSentTO map(ChallengeEntity challengeEntity) {
 		if (challengeEntity != null && challengeEntity.getPlayerChallenged() != null) {
-			ChallengeTO challengeTo = new ChallengeTO();
+			ChallengeSentTO challengeTo = new ChallengeSentTO();
 			challengeTo.setIdChallenge(challengeEntity.getId());
 			challengeTo.setLevelPlayerChallenged(challengeEntity.getLevelPlayerChallenged());
 			challengeTo.setPointsPlayerChallenged(challengeEntity.getPlayerChallenged().getPoints());
@@ -18,9 +19,10 @@ public class ChallengeMapper {
 			challengeTo.setGamesWonPlayerChallenged(challengeEntity.getPlayerChallenged().getGamesWon());
 			challengeTo.setGamesDrawnPlayerChallenged(challengeEntity.getPlayerChallenged().getGamesDrawn());
 			challengeTo.setGamesLostPlayerChallenged(challengeEntity.getPlayerChallenged().getGamesLost());
-			challengeTo.setDateCreationChallenge(challengeEntity.getDateCreated());
-			challengeTo.setPotentialBenefitForChallengingPlayer(challengeEntity.getPlayerChallenged().getPotentialBenefitForChallengingPlayer());
-			challengeTo.setPotentialLossForChallengingPlayer(challengeEntity.getPlayerChallenged().getPotentialLossForChallengingPlayer());
+			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+			challengeTo.setStringDateCreationChallenge(simpleDateFormat.format(challengeEntity.getDateCreated().getTime()));
+			challengeTo.setPotentialBenefitForChallengingPlayer(challengeEntity.getPlayerChallenged().getPotentialBenefitForOtherPlayer());
+			challengeTo.setPotentialLossForChallengingPlayer(challengeEntity.getPlayerChallenged().getPotentialLossForOtherPlayer());
 			challengeTo.setLoginPlayerChallenged(challengeEntity.getPlayerChallenged().getPlayerProfile().getLogin());
 			StringBuilder nameBuilder = new StringBuilder();
 			challengeTo.setNamePlayerChallenged(nameBuilder.append(challengeEntity.getPlayerChallenged().getPlayerProfile().getFirstName())
@@ -30,17 +32,8 @@ public class ChallengeMapper {
 		return null;
 	}
 	
-//	public static ChallengeEntity map(ChallengeTO challengeTo) {
-//		if (challengeTo != null) {
-//			ChallengeEntity challengeEntity = new ChallengeEntity();
-//			challengeEntity.setId(challengeTo.getIdChallenge());
-////			challengeEntity.set
-//		}
-//		return null;
-//	}
-	
-	public static List<ChallengeTO> map2TOs(List<ChallengeEntity> challengeEntities) {
-		return challengeEntities.stream().map(ChallengeMapper::map).collect(Collectors.toList());
+	public static List<ChallengeSentTO> map2TOs(List<ChallengeEntity> challengeEntities) {
+		return challengeEntities.stream().map(ChallengeSentMapper::map).collect(Collectors.toList());
 	}
 
 }

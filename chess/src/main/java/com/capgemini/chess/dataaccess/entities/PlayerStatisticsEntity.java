@@ -67,10 +67,10 @@ public class PlayerStatisticsEntity extends VersionControl implements Serializab
 	private Level level = Level.NEWBIE;
 	
 	@Transient
-	private int potentialBenefitForChallengingPlayer;
+	private int potentialBenefitForOtherPlayer;
 	
 	@Transient
-	private int potentialLossForChallengingPlayer;
+	private int potentialLossForOtherPlayer;
 	
 	@Transient
 	private long rankingPosition;
@@ -175,20 +175,20 @@ public class PlayerStatisticsEntity extends VersionControl implements Serializab
 		this.level = level;
 	}
 
-	public int getPotentialBenefitForChallengingPlayer() {
-		return potentialBenefitForChallengingPlayer;
+	public int getPotentialBenefitForOtherPlayer() {
+		return potentialBenefitForOtherPlayer;
 	}
 
-	public void setPotentialBenefitForChallengingPlayer(int potentialBenefitForChallengingPlayer) {
-		this.potentialBenefitForChallengingPlayer = potentialBenefitForChallengingPlayer;
+	public void setPotentialBenefitForOtherPlayer(int potentialBenefitForChallengingPlayer) {
+		this.potentialBenefitForOtherPlayer = potentialBenefitForChallengingPlayer;
 	}
 
-	public int getPotentialLossForChallengingPlayer() {
-		return potentialLossForChallengingPlayer;
+	public int getPotentialLossForOtherPlayer() {
+		return potentialLossForOtherPlayer;
 	}
 
-	public void setPotentialLossForChallengingPlayer(int potentialLossForChallengingPlayer) {
-		this.potentialLossForChallengingPlayer = potentialLossForChallengingPlayer;
+	public void setPotentialLossForOtherPlayer(int potentialLossForChallengingPlayer) {
+		this.potentialLossForOtherPlayer = potentialLossForChallengingPlayer;
 	}
 
 	public long getRankingPosition() {

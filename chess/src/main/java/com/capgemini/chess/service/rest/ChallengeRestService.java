@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -20,12 +20,13 @@ import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
-import com.capgemini.chess.service.mapper.ChallengeMapper;
+import com.capgemini.chess.service.mapper.ChallengeReceivedMapper;
+import com.capgemini.chess.service.mapper.ChallengeSentMapper;
 import com.capgemini.chess.service.mapper.PlayerMatchingMapper;
-import com.capgemini.chess.service.to.ChallengeTO;
+import com.capgemini.chess.service.to.ChallengeReceivedTO;
+import com.capgemini.chess.service.to.ChallengeSentTO;
 import com.capgemini.chess.service.to.PlayerMatchingTO;
 
-@CrossOrigin(origins = "http://localhost:9000")
 @RequestMapping("/chess/challenge")
 @RestController
 public class ChallengeRestService {
@@ -68,11 +69,11 @@ public class ChallengeRestService {
 	 * @param idChallenge 
 	 * @return
 	 */
-	@RequestMapping(value = "/decline/{idChallenge}", method = RequestMethod.DELETE)
+	@RequestMapping(value = "/decline", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(value = HttpStatus.OK)
-	public void declineChallenge(@PathVariable(value = "idChallenge") 
-			final long idChallenge) throws ChallengeNotExistException, ChallengeDeclineException {
-		challengeService.declineChallenge(idChallenge);
+	public void declineChallenge(@RequestBody ChallengeReceivedTO challenge) 
+					throws ChallengeNotExistException, ChallengeDeclineException {
+		challengeService.declineChallenge(challenge.getIdChallenge());
 	}
 	
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Challenge can be declined only by Player, who received it.")
@@ -81,11 +82,10 @@ public class ChallengeRestService {
 		
 	}
 	
-	@RequestMapping(value = "/accept/{idChallenge}", method = RequestMethod.POST)
+	@RequestMapping(value = "/accept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(value = HttpStatus.OK)
-	public void acceptChallenge(@PathVariable(value = "idChallenge") 
-			final long idChallenge) throws ChallengeIsNoLongerValidException, ChallengeNotExistException {
-		challengeService.acceptChallenge(idChallenge);
+	public void acceptChallenge(@RequestBody ChallengeReceivedTO challenge) throws ChallengeIsNoLongerValidException, ChallengeNotExistException {
+		challengeService.acceptChallenge(challenge.getIdChallenge());
 	}
 	
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Challenge does not exist anymore.")
@@ -102,24 +102,24 @@ public class ChallengeRestService {
 	
 	@RequestMapping(value = "/sentChallenges/{idRequestingPlayer}", method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ChallengeTO>> getSentChallenges(@PathVariable(value = "idRequestingPlayer") 
+	public ResponseEntity<List<ChallengeSentTO>> getSentChallenges(@PathVariable(value = "idRequestingPlayer") 
 			final long idRequestingPlayer) {
-		List<ChallengeTO> sentChallenges = ChallengeMapper.map2TOs(challengeService.getSentChallenges(idRequestingPlayer));
+		List<ChallengeSentTO> sentChallenges = ChallengeSentMapper.map2TOs(challengeService.getSentChallenges(idRequestingPlayer));
 		if (sentChallenges.isEmpty()) {
-			return new ResponseEntity<List<ChallengeTO>>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<List<ChallengeSentTO>>(HttpStatus.NO_CONTENT);
 		}
-		return new ResponseEntity<List<ChallengeTO>>(sentChallenges, HttpStatus.OK);
+		return new ResponseEntity<List<ChallengeSentTO>>(sentChallenges, HttpStatus.OK);
 	}
 	
 	@RequestMapping(value = "/receivedChallenges/{idRequestingPlayer}", method = RequestMethod.GET, 
 			produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<ChallengeTO>> getReceivedChallenges(@PathVariable(value = "idRequestingPlayer") 
+	public ResponseEntity<List<ChallengeReceivedTO>> getReceivedChallenges(@PathVariable(value = "idRequestingPlayer") 
 			final long idRequestingPlayer) {
-		List<ChallengeTO> receivedChallenges = ChallengeMapper.map2TOs(challengeService.getReceivedChallenges(idRequestingPlayer));
+		List<ChallengeReceivedTO> receivedChallenges = ChallengeReceivedMapper.map2TOs(challengeService.getReceivedChallenges(idRequestingPlayer));
 		if (receivedChallenges.isEmpty()) {
-			return new ResponseEntity<List<ChallengeTO>>(HttpStatus.NO_CONTENT);
+			return new ResponseEntity<List<ChallengeReceivedTO>>(HttpStatus.NO_CONTENT);
 		}
-		return new ResponseEntity<List<ChallengeTO>>(receivedChallenges, HttpStatus.OK);
+		return new ResponseEntity<List<ChallengeReceivedTO>>(receivedChallenges, HttpStatus.OK);
 	}
 	
 	/**This method will be possible to perform only by Admin.
