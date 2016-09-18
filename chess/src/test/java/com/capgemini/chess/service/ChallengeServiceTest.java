@@ -27,7 +27,6 @@ import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeCreationException;
-import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -363,18 +362,6 @@ public class ChallengeServiceTest {
 		//then
 		Assert.assertEquals(challengesNumberBeforeDecline - 1, challengesAllAfterDecline.size());
 		Assert.assertNull(challengeRepository.findOne(idChallengeExistingWhereIdReceiverIs10));
-	}
-	
-	@Test
-	public void testShouldThrowExceptionWhenDeclineChallengeByPlayerWhoDidNotReceiveIt() throws Exception {
-		//given
-		final long idChallengeExistingWhereIdReceiverIsNot10 = 39L;
-		
-		//then
-		thrown.expect(ChallengeDeclineException.class);
-		
-		//when
-		challengeService.declineChallenge(idChallengeExistingWhereIdReceiverIsNot10);
 	}
 	
 	@Test

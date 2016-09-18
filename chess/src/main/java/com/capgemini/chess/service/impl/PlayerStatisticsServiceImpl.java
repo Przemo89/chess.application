@@ -206,7 +206,7 @@ public class PlayerStatisticsServiceImpl implements PlayerStatisticsService {
 	}
 	
 	private int calculateBonusForWinner(PlayerStatisticsEntity winningPlayer, PlayerStatisticsEntity loosingPlayer, int baseProfit) {
-		double progressDifference = calculateProgress(loosingPlayer) - calculateProgress(winningPlayer);
+		double progressDifference = Math.abs(calculateProgress(loosingPlayer) - calculateProgress(winningPlayer));
 		int result = (int) Math.floor(progressDifference*baseProfit*0.5);
 		return result;
 	}

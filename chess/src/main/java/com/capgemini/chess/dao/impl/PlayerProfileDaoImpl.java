@@ -27,8 +27,9 @@ public class PlayerProfileDaoImpl extends AbstractDao<PlayerProfileEntity, Long>
 		TypedQuery<PlayerProfileEntity> query = entityManager.createQuery(
 				"select p from PlayerProfileEntity p "
 				+ "join fetch p.playerStatistics ps "
-				+ "where login like :login", PlayerProfileEntity.class);
+				+ "where login like concat('%', :login, '%')", PlayerProfileEntity.class);
 		query.setParameter("login", login);
+		query.setMaxResults(10);
 		return query.getResultList();
 	}
 

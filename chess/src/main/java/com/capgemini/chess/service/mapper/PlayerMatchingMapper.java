@@ -11,7 +11,7 @@ public class PlayerMatchingMapper {
 	public static PlayerMatchingTO map(PlayerStatisticsEntity playerStats) {
 		if (playerStats != null && playerStats.getPlayerProfile() != null) {
 			PlayerMatchingTO playerMatchingTo = new PlayerMatchingTO();
-			playerMatchingTo.setId(playerStats.getId());
+			playerMatchingTo.setIdPlayerStatistics(playerStats.getId());
 			playerMatchingTo.setLevel(playerStats.getLevel());
 			playerMatchingTo.setPoints(playerStats.getPoints());
 			playerMatchingTo.setGamesPlayed(playerStats.getGamesPlayed());

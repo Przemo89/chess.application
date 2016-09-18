@@ -1,6 +1,5 @@
 package com.capgemini.chess.service.rest;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -22,6 +21,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import com.capgemini.chess.dao.ChallengeDao;
@@ -29,15 +29,18 @@ import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeCreationException;
-import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
 import com.capgemini.chess.service.ChallengeService;
+import com.capgemini.chess.service.mapper.ChallengeReceivedMapper;
 import com.capgemini.chess.service.mapper.ChallengeSentMapper;
 import com.capgemini.chess.service.mapper.PlayerMatchingMapper;
+import com.capgemini.chess.service.to.ChallengeReceivedTO;
 import com.capgemini.chess.service.to.ChallengeSentTO;
+import com.capgemini.chess.service.to.ChallengeToBeCreatedTO;
 import com.capgemini.chess.service.to.PlayerMatchingTO;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"classpath:**/challenge-rest-service-test-configuration.xml", "classpath:**/database-configuration-rest-test.xml"})
@@ -73,12 +76,17 @@ public class ChallengeRestServiceTest {
 	@Test
 	public void shouldReturnOkStatusWhenCreatingChallenge() throws Exception {
 		// given 
-		long idOfChallengingPlayer = 354L;
-		long idOfChallengedPlayer = 376L;
+		long idPlayerStatisticsChallengingNotExisting = 354L;
+		long idPlayerStatisticsChallengedNotExisting = 376L;
+		ChallengeToBeCreatedTO challenge = new ChallengeToBeCreatedTO();
+		challenge.setIdPlayerStatisticsChallenging(idPlayerStatisticsChallengingNotExisting);
+		challenge.setIdPlayerStatisticsChallenged(idPlayerStatisticsChallengedNotExisting);
+		ObjectMapper mapperJson = new ObjectMapper();
+		String json = mapperJson.writeValueAsString(challenge);
 		
 		// when
-		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/" + idOfChallengingPlayer
-				+ "/" + idOfChallengedPlayer));
+		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()));
 
 		// then
 		response.andExpect(status().isOk());
@@ -87,14 +95,19 @@ public class ChallengeRestServiceTest {
 	@Test
 	public void testShouldReturnNotFoundStatusWhenCreateManualChallenge() throws Exception {
 		// given 
-		long idPlayerChallengingNotExisting = 354L;
-		long idPlayerChallengedNotExisting = 376L;
+		long idPlayerStatisticsChallengingNotExisting = 354L;
+		long idPlayerStatisticsChallengedNotExisting = 376L;
+		ChallengeToBeCreatedTO challenge = new ChallengeToBeCreatedTO();
+		challenge.setIdPlayerStatisticsChallenging(idPlayerStatisticsChallengingNotExisting);
+		challenge.setIdPlayerStatisticsChallenged(idPlayerStatisticsChallengedNotExisting);
+		ObjectMapper mapperJson = new ObjectMapper();
+		String json = mapperJson.writeValueAsString(challenge);
 		
 		// when
 		Mockito.doThrow(new ChallengeCreationException()).when(challengeService)
-				.createOrUpdateChallenge(idPlayerChallengingNotExisting, idPlayerChallengedNotExisting);
-		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/" + idPlayerChallengingNotExisting
-				+ "/" + idPlayerChallengedNotExisting));
+				.createOrUpdateChallenge(idPlayerStatisticsChallengingNotExisting, idPlayerStatisticsChallengedNotExisting);
+		ResultActions response = this.mockMvc.perform(post("/chess/challenge/manual/create/").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()));
 
 		// then
 		response.andExpect(status().isNotFound());
@@ -127,11 +140,11 @@ public class ChallengeRestServiceTest {
 				.accept(MediaType.APPLICATION_JSON).contentType(MediaType.APPLICATION_JSON).content("5"));
 
 		response.andExpect(status().isOk())
-				.andExpect(jsonPath("[0].id").value(new Integer((int) mockResultListMappedToTOs.get(0).getId())))
-				.andExpect(jsonPath("[1].id").value(new Integer((int) mockResultListMappedToTOs.get(1).getId())))
-				.andExpect(jsonPath("[2].id").value(new Integer((int) mockResultListMappedToTOs.get(2).getId())))
-				.andExpect(jsonPath("[3].id").value(new Integer((int) mockResultListMappedToTOs.get(3).getId())))
-				.andExpect(jsonPath("[4].id").value(new Integer((int) mockResultListMappedToTOs.get(4).getId())));
+				.andExpect(jsonPath("[0].idPlayerStatistics").value(new Integer((int) mockResultListMappedToTOs.get(0).getIdPlayerStatistics())))
+				.andExpect(jsonPath("[1].idPlayerStatistics").value(new Integer((int) mockResultListMappedToTOs.get(1).getIdPlayerStatistics())))
+				.andExpect(jsonPath("[2].idPlayerStatistics").value(new Integer((int) mockResultListMappedToTOs.get(2).getIdPlayerStatistics())))
+				.andExpect(jsonPath("[3].idPlayerStatistics").value(new Integer((int) mockResultListMappedToTOs.get(3).getIdPlayerStatistics())))
+				.andExpect(jsonPath("[4].idPlayerStatistics").value(new Integer((int) mockResultListMappedToTOs.get(4).getIdPlayerStatistics())));
 	}
 	
 	@Test
@@ -164,12 +177,17 @@ public class ChallengeRestServiceTest {
 	}
 	
 	@Test
+	@Transactional
 	public void testShouldReturnOkStatusWhenDeclineChallenge() throws Exception {
 		// given 
 		long idChallenge = 10L;
+		ChallengeReceivedTO challengeExisting = ChallengeReceivedMapper.map(challengeDao.getOne(idChallenge));
+		ObjectMapper mapperJson = new ObjectMapper();
+		String json = mapperJson.writeValueAsString(challengeExisting);
 		
 		// when
-		ResultActions response = this.mockMvc.perform(delete("/chess/challenge/decline/" + idChallenge));
+		ResultActions response = this.mockMvc.perform(post("/chess/challenge/decline/").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(json));
 		
 		// then
 		Mockito.verify(challengeService).declineChallenge(idChallenge);
@@ -179,40 +197,34 @@ public class ChallengeRestServiceTest {
 	@Test
 	public void testShouldNotFoundStatusWhenDeclineChallengeThatNotExists() throws Exception {
 		// given 
-		final long idChallengeNotExisting = 1078L;
+		final long idChallengeExisting = 10L;
+		ChallengeReceivedTO challenge = ChallengeReceivedMapper.map(challengeDao.findOne(idChallengeExisting));
+		ObjectMapper mapperJson = new ObjectMapper();
+		String json = mapperJson.writeValueAsString(challenge);
 		
 		// when
-		Mockito.doThrow(new ChallengeNotExistException(idChallengeNotExisting))
-				.when(challengeService).declineChallenge(idChallengeNotExisting);
-		ResultActions response = this.mockMvc.perform(delete("/chess/challenge/decline/" + idChallengeNotExisting));
+		Mockito.doThrow(new ChallengeNotExistException(idChallengeExisting))
+				.when(challengeService).declineChallenge(idChallengeExisting);
+		ResultActions response = this.mockMvc.perform(post("/chess/challenge/decline/").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(json));
 		
 		// then
-		Mockito.verify(challengeService).declineChallenge(idChallengeNotExisting);
+		Mockito.verify(challengeService).declineChallenge(idChallengeExisting);
 		response.andExpect(status().isNotFound());
 	}
 	
 	@Test
-	public void testShouldNotFoundStatusWhenDeclineChallengeByPlayerWhoNotReceivedIt() throws Exception {
-		// given 
-		final long idChallengeNotExisting = 107356L;
-		
-		// when
-		Mockito.doThrow(new ChallengeDeclineException())
-				.when(challengeService).declineChallenge(idChallengeNotExisting);
-		ResultActions response = this.mockMvc.perform(delete("/chess/challenge/decline/" + idChallengeNotExisting));
-		
-		// then
-		Mockito.verify(challengeService).declineChallenge(idChallengeNotExisting);
-		response.andExpect(status().isNotFound());
-	}
-	
-	@Test
+	@Transactional
 	public void testShouldReturnOkStatusWhenAcceptChallenge() throws Exception {
 		// given 
 		final long idChallenge = 10L;
+		ChallengeReceivedTO challengeExisting = ChallengeReceivedMapper.map(challengeDao.getOne(idChallenge));
+		ObjectMapper mapperJson = new ObjectMapper();
+		String json = mapperJson.writeValueAsString(challengeExisting);
 		
 		// when
-		ResultActions response = this.mockMvc.perform(post("/chess/challenge/accept/" + idChallenge));
+		ResultActions response = this.mockMvc.perform(post("/chess/challenge/accept/").accept(MediaType.APPLICATION_JSON)
+				.contentType(MediaType.APPLICATION_JSON).content(json.getBytes()));
 
 		// then
 		Mockito.verify(challengeService).acceptChallenge(idChallenge);

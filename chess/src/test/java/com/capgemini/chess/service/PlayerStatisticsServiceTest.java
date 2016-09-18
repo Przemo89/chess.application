@@ -83,7 +83,7 @@ public class PlayerStatisticsServiceTest {
 	 * (Level(loser) - Level(Winner)) = 7 - 2 = 5).
 	 */
 	@Test
-	public void shouldReturn1124AsProfitForWinningPlayer() {
+	public void shouldReturn1453AsProfitForWinningPlayer() {
 		//given
 		PlayerStatisticsEntity winningPlayer = new PlayerStatisticsEntity();
 		PlayerStatisticsEntity loosingPlayer = new PlayerStatisticsEntity();
@@ -95,7 +95,7 @@ public class PlayerStatisticsServiceTest {
 		winningPlayer.setPoints(400);
 		winningPlayer.setGamesPlayed(10);
 		winningPlayer.setGamesWon(2);
-		int properResult = 1124;
+		int properResult = 1435;
 		
 		//when
 		int resultBonusForWinner = playerStatisticsService.calculateWinnerProfit(winningPlayer, loosingPlayer);
@@ -308,7 +308,7 @@ public class PlayerStatisticsServiceTest {
 		assertEquals(245, playerOne.getGamesPlayed());
 		assertEquals(137, playerOne.getGamesWon());
 		assertEquals(51, playerOne.getGamesLost());
-		assertEquals(Level.EXPERIENCED_MIDDLEBORW, playerOne.getLevel());
+		assertEquals(Level.EXPERIENCED_MIDDLEBROW, playerOne.getLevel());
 		assertEquals(Level.WEAKLING, playerTwo.getLevel());
 	}
 	

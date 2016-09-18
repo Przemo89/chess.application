@@ -4,7 +4,7 @@ import com.capgemini.chess.algorithms.data.enums.Level;
 
 public class PlayerMatchingTO {
 
-	private long id;
+	private long idPlayerStatistics;
 	private Level level;
 	private int points;
 	private int gamesPlayed;
@@ -21,15 +21,15 @@ public class PlayerMatchingTO {
 	public PlayerMatchingTO() {
 		
 	}
-
-	public long getId() {
-		return id;
-	}
-
-	public void setId(long id) {
-		this.id = id;
-	}
 	
+	public long getIdPlayerStatistics() {
+		return idPlayerStatistics;
+	}
+
+	public void setIdPlayerStatistics(long idPlayerStatistics) {
+		this.idPlayerStatistics = idPlayerStatistics;
+	}
+
 	public Level getLevel() {
 		return level;
 	}

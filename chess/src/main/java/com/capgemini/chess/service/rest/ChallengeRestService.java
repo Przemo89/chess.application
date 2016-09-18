@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capgemini.chess.exception.ChallengeCreationException;
-import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -25,6 +24,7 @@ import com.capgemini.chess.service.mapper.ChallengeSentMapper;
 import com.capgemini.chess.service.mapper.PlayerMatchingMapper;
 import com.capgemini.chess.service.to.ChallengeReceivedTO;
 import com.capgemini.chess.service.to.ChallengeSentTO;
+import com.capgemini.chess.service.to.ChallengeToBeCreatedTO;
 import com.capgemini.chess.service.to.PlayerMatchingTO;
 
 @RequestMapping("/chess/challenge")
@@ -34,11 +34,10 @@ public class ChallengeRestService {
 	@Autowired
 	private ChallengeService challengeService;
 	
-	@RequestMapping(value = "/manual/create/{idChallenger}/{idChallenged}", method = RequestMethod.POST)
+	@RequestMapping(value = "/manual/create/", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(value = HttpStatus.OK)
-	public void createManualChallenge(@PathVariable(value = "idChallenger") final long idOfChallengingPlayer, 
-			@PathVariable(value = "idChallenged") final long idOfChallengedPlayer) throws ChallengeCreationException {
-		challengeService.createOrUpdateChallenge(idOfChallengingPlayer, idOfChallengedPlayer);
+	public void createManualChallenge(@RequestBody ChallengeToBeCreatedTO challengeToBeCreated) throws ChallengeCreationException {
+		challengeService.createOrUpdateChallenge(challengeToBeCreated.getIdPlayerStatisticsChallenging(), challengeToBeCreated.getIdPlayerStatisticsChallenged());
 	}
 
 	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Player does not exist.")
@@ -64,22 +63,22 @@ public class ChallengeRestService {
 		
 	}
 	
-	/**Declines challenge - in this case such challenge is simply removed from DB,
-	 * hence RequestMethod.DELETE .
-	 * @param idChallenge 
-	 * @return
+	/**Declines challenge - in this case such challenge is simply removed from DB.
 	 */
 	@RequestMapping(value = "/decline", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
 	@ResponseStatus(value = HttpStatus.OK)
 	public void declineChallenge(@RequestBody ChallengeReceivedTO challenge) 
-					throws ChallengeNotExistException, ChallengeDeclineException {
+					throws ChallengeNotExistException {
 		challengeService.declineChallenge(challenge.getIdChallenge());
 	}
 	
-	@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Challenge can be declined only by Player, who received it.")
-	@ExceptionHandler(ChallengeDeclineException.class)
-	private void challengeDeclineExceptionHandler() {
-		
+	/**Cancels (removes) challenge - in this case such challenge is simply removed from DB.
+	 */
+	@RequestMapping(value = "/cancel", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+	@ResponseStatus(value = HttpStatus.OK)
+	public void cancelChallenge(@RequestBody ChallengeSentTO challenge) 
+					throws ChallengeNotExistException {
+		challengeService.declineChallenge(challenge.getIdChallenge());
 	}
 	
 	@RequestMapping(value = "/accept", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)

@@ -27,6 +27,5 @@ public interface PlayerStatisticsDao extends Dao<PlayerStatisticsEntity, Long> {
 	 * @return list which should contain two filled entities. Service will verify it and in case when 
 	 * some of the returned entities would turn out to be null, proper Exception will be thrown.
 	 */
-	List<PlayerStatisticsEntity> findBothPlayerStatisticsForChallengeCreation(long idPlayerChallenging,
-			long idPlayerChallenged);
+	PlayerStatisticsEntity getPlayerStatisticsWithChallengesSent(long idPlayerChallenging);
 }

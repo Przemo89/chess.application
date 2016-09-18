@@ -16,22 +16,22 @@ import com.capgemini.chess.service.PlayerProfileService;
 public class PlayerProfileServiceImpl implements PlayerProfileService {
 
 	@Autowired
-	private PlayerProfileDao playerProfileRepository;
+	private PlayerProfileDao playerProfileDao;
 	
 	@Autowired
-	private PlayerStatisticsDao playerStatisticsRepository;
+	private PlayerStatisticsDao playerStatisticsDao;
 	
 	@Override
 	public PlayerProfileEntity readPlayerProfile(Long idPlayerProfile) {
-		PlayerProfileEntity playerProfile = playerProfileRepository.getPlayerProfileAndStatistics(idPlayerProfile);
-		playerProfile.getPlayerStatistics().setRankingPosition(playerStatisticsRepository
+		PlayerProfileEntity playerProfile = playerProfileDao.getPlayerProfileAndStatistics(idPlayerProfile);
+		playerProfile.getPlayerStatistics().setRankingPosition(playerStatisticsDao
 				.getPlayerRankingPosition(playerProfile.getPlayerStatistics().getPoints())+1);
 		return playerProfile;
 	}
 
 	@Override
 	public List<PlayerProfileEntity> getPlayersProfilesByLogin(String login) {
-		return playerProfileRepository.getPlayersProfilesByLogin(login);
+		return playerProfileDao.getPlayersProfilesByLogin(login);
 	}
 	
 	

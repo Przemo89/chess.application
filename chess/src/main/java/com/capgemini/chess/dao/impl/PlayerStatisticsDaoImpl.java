@@ -44,16 +44,12 @@ public class PlayerStatisticsDaoImpl extends AbstractDao<PlayerStatisticsEntity,
 	 * some of the returned entities would turn out to be null, proper Exception will be thrown.
 	 */
 	@Override
-	public List<PlayerStatisticsEntity> findBothPlayerStatisticsForChallengeCreation(long idPlayerChallenging,
-			long idPlayerChallenged) {
+	public PlayerStatisticsEntity getPlayerStatisticsWithChallengesSent(long idPlayerChallenging) {
 		TypedQuery<PlayerStatisticsEntity> query = entityManager.createQuery( 
 				"select p from PlayerStatisticsEntity p "
 				+ "left join p.challengesSent c "
-				+ "where p.id in (:id_player_statistics_challenging, :id_player_statistics_challenged) "
-				+ "or (id_player_statistics_challenging = :id_player_statistics_challenging "
-				+ "and id_player_statistics_challenged = :id_player_statistics_challenged)", PlayerStatisticsEntity.class);
+				+ "where p.id = :id_player_statistics_challenging", PlayerStatisticsEntity.class);
 		query.setParameter("id_player_statistics_challenging", idPlayerChallenging);
-		query.setParameter("id_player_statistics_challenged", idPlayerChallenged);
-		return query.getResultList();
+		return query.getSingleResult();
 	}
 }

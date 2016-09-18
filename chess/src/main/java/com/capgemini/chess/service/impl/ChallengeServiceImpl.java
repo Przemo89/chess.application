@@ -13,7 +13,6 @@ import com.capgemini.chess.dao.PlayerStatisticsDao;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeCreationException;
-import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -48,21 +47,20 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Transactional(readOnly = false)
 	public ChallengeEntity createOrUpdateChallenge(long idPlayerChallenging, long idPlayerChallenged) 
 			throws ChallengeCreationException {
-		List<PlayerStatisticsEntity> playersStatistics = playerStatisticsDao
-				.findBothPlayerStatisticsForChallengeCreation(idPlayerChallenging, idPlayerChallenged);
 		isPlayerChallengingHimself(idPlayerChallenging, idPlayerChallenged);
-		int playerChallengingIndexInList = setPlayerChallengingIndexInList(playersStatistics.get(0), idPlayerChallenging);
-		int playerChallengedIndexInList = setPlayerChallengedIndexInList(playerChallengingIndexInList);
-		
-		if (playersStatistics.get(playerChallengingIndexInList).getChallengesSent().isEmpty() == false 
-				&& playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0) != null) {
-			// At least Date of Creation has to be changed, otherwise Listeners won't be triggered and no changes will be made.
-			playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0).setDateCreated(null);
-			return challengeDao.update(playersStatistics.get(playerChallengingIndexInList).getChallengesSent().get(0));
+		PlayerStatisticsEntity playerChallenging = playerStatisticsDao.getPlayerStatisticsWithChallengesSent(idPlayerChallenging);
+		if (playerChallenging.getChallengesSent().isEmpty() == false) {
+			for (ChallengeEntity challenge: playerChallenging.getChallengesSent()) {
+				if (challenge.getPlayerChallenging().getId() == idPlayerChallenging && challenge.getPlayerChallenged().getId() == idPlayerChallenged) {
+					challenge.setDateCreated(null);
+					return challengeDao.update(challenge);
+				}
+			}
 		}
+		PlayerStatisticsEntity playerChallenged = playerStatisticsDao.findOne(idPlayerChallenged);
 		ChallengeEntity challenge = new ChallengeEntity();
 		setChallengeEntityForChallengeCreation(challenge, 
-				playersStatistics.get(playerChallengingIndexInList), playersStatistics.get(playerChallengedIndexInList));
+				playerChallenging, playerChallenged);
 		return challengeDao.save(challenge);
 	}
 
@@ -79,21 +77,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 		challenge.setPlayerChallenged(playerChallenged);
 		challenge.setLevelPlayerChallenging(playerChallenging.getLevel());
 		challenge.setLevelPlayerChallenged(playerChallenged.getLevel());
-	}
-
-	private int setPlayerChallengingIndexInList(PlayerStatisticsEntity playerStatistics,
-			long idPlayerChallenging) {
-		if (playerStatistics.getId() == idPlayerChallenging) {
-			return 0;
-		}
-		return 1;
-	}
-	
-	private int setPlayerChallengedIndexInList(int playerChallengingIndexInList) {
-		if (playerChallengingIndexInList == 0) {
-			return 1;
-		}
-		return 0;
 	}
 
 	/**Finds matching players during creation of challenge list (automatic)
@@ -159,10 +142,9 @@ public class ChallengeServiceImpl implements ChallengeService {
 	@Override
 	@Transactional(readOnly = false)
 	public void declineChallenge(long idChallenge) 
-			throws ChallengeDeclineException, ChallengeNotExistException {
+			throws ChallengeNotExistException {
 		ChallengeEntity challengeToDelete = challengeDao.findOne(idChallenge);
 		isChallengeExists(challengeToDelete, idChallenge);
-//		isChallengeDeclinedByPlayerChallenged(challengeToDelete);
 		challengeDao.delete(challengeToDelete);
 	}
 
@@ -171,21 +153,6 @@ public class ChallengeServiceImpl implements ChallengeService {
 		if (challengeToDelete == null) {
 			throw new ChallengeNotExistException(idChallenge);
 		}
-	}
-
-	private void isChallengeDeclinedByPlayerChallenged(ChallengeEntity challengeToDelete)
-			throws ChallengeDeclineException {
-		if (getIdRequestingPlayer() != challengeToDelete.getPlayerChallenged().getId()) {
-			throw new ChallengeDeclineException();
-		}
-	}
-	
-	/**Will return requesting player's id from SecurityContextHolder when it will be implemented.
-	 * For now will return always 10L.
-	 * @return
-	 */
-	private long getIdRequestingPlayer() {
-		return 10L;
 	}
 
 	/**Checks if challenge exist, then compares level of players from:

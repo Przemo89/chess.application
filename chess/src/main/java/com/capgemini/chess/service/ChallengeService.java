@@ -5,7 +5,6 @@ import java.util.List;
 import com.capgemini.chess.dataaccess.entities.ChallengeEntity;
 import com.capgemini.chess.dataaccess.entities.PlayerStatisticsEntity;
 import com.capgemini.chess.exception.ChallengeCreationException;
-import com.capgemini.chess.exception.ChallengeDeclineException;
 import com.capgemini.chess.exception.ChallengeIsNoLongerValidException;
 import com.capgemini.chess.exception.ChallengeNotExistException;
 import com.capgemini.chess.exception.PlayerNotExistException;
@@ -31,7 +30,7 @@ public interface ChallengeService {
 	/**Removes record containing specific challenge from DB through ChallengeDAO.
 	 * @param challenge - challenge, which is to be declined
 	 */
-	void declineChallenge(long idChallenge) throws ChallengeDeclineException, ChallengeNotExistException;
+	void declineChallenge(long idChallenge) throws ChallengeNotExistException;
 	
 	/**Checks if challenge exist, then compares level of players from:
 	 * 1. Moment when challenge has been created (from ChallengeEntity)
